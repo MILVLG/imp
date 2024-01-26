@@ -17,14 +17,14 @@ We release our model weights and provide an example below to run our model . Det
 ## Model evaluation
 We conduct evaluation on 9 commonly-used benchmarks, including 5 academic VQA benchmarks and 4 popular MLLM benchmarks, to compare our Imp model with LLaVA (7B) and existing MSLMs of similar model sizes.
 
-| Models | VQAv2 | GQA |VizWiz  | SQA(IMG) | TextVQA | POPE |  MME(P) | MMB  |MM-Vet|
-|:--------:|:----:|:----:|:-------------:|:--------:|:-----:|:----:|:-------:|:-------:|:-------:|
-| [LLaVA-v1.5-lora](https://github.com/haotian-liu/LLaVA) (7B) |79.10 | **63.00** |47.80 |  68.40 |58.20| 86.40 | **1476.9** | 66.10  |30.2|
-| [TinyGPT-V](https://github.com/DLYuanGod/TinyGPT-V) (3B) | - | 33.60  | 24.80  |    -   |    -  | -| - | -  |-|
-| [LLaVA-Phi](https://github.com/zhuyiche/llava-phi) (3B) | 71.40  | - | 35.90 |    68.40   |    48.60  | 85.00 | 1335.1 | 59.80 |28.9|
-| [MobileVLM](https://github.com/Meituan-AutoML/MobileVLM) (3B) | - | 59.00  | - |    61.00   |    47.50   | 84.90 | 1288.9 | 59.60  |-|
-| [MC-LLaVA-3b](https://huggingface.co/visheratin/MC-LLaVA-3b) (3B) | 64.24 | 49.60  | 24.88 |    -   |    38.59   | 80.59 | - | -  |-|
-| **Imp-v1 (3B, ours)** | **79.45**  | 58.55 | **50.09** |**69.96**| **59.38** | **88.02**| 1434.0 | **66.49**  |**33.1**|
+| Models | Size | VQAv2 | GQA |VizWiz  | SQA(IMG) | TextVQA | POPE |  MME(P) | MMB  |MM-Vet|
+|:--------:|:-----:|:----:|:----:|:-------------:|:--------:|:-----:|:----:|:-------:|:-------:|:-------:|
+| [LLaVA-v1.5-lora](https://huggingface.co/liuhaotian/llava-v1.5-7b) | 7B |79.10 | **63.00** |47.80 |  68.40 |58.20| 86.40 | **1476.9** | 66.10  |30.2|
+| [TinyGPT-V](https://huggingface.co/Tyrannosaurus/TinyGPT-V) | 3B | - | 33.60  | 24.80  |    -   |    -  | -| - | -  |-|
+| [LLaVA-Phi](https://github.com/zhuyiche/llava-phi) | 3B | 71.40  | - | 35.90 |    68.40   |    48.60  | 85.00 | 1335.1 | 59.80 |28.9|
+| [MobileVLM](https://huggingface.co/mtgv/MobileVLM-3B) | 3B | - | 59.00  | - |    61.00   |    47.50   | 84.90 | 1288.9 | 59.60  |-|
+| [MC-LLaVA-3b](https://huggingface.co/visheratin/MC-LLaVA-3b) | 3B | 64.24 | 49.60  | 24.88 |    -   |    38.59   | 80.59 | - | -  |-|
+| **Imp-v1 (ours)** | 3B | **79.45**  | 58.55 | **50.09** |**69.96**| **59.38** | **88.02**| 1434.0 | **66.49**  |**33.1**|
 
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) file for details.
