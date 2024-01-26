@@ -12,7 +12,7 @@ The Imp project aims to provide a family of  a strong multimodal `small` languag
 
 As shown in the Table below, `imp-v1-3b` significantly outperforms the counterparts of similar model sizes, and even achieves slightly better performance than the strong LLaVA-7B model on various multimodal benchmarks. 
 
-We release our model weights and provide an example below to run our model . Detailed technical report and corresponding training and evaluation code will be released soon. We will persistently improve our model and release the next versions to further improve model performance :)
+We release the model weights a running example of `imp-v0-3B` on [Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/). Technical report and training and evaluation code will be released soon. We will persistently improve our model and release the next versions to further improve model performance :)
 
 ## Model evaluation
 We conduct evaluation on 9 commonly-used benchmarks, including 5 academic VQA benchmarks and 4 popular MLLM benchmarks, to compare our Imp model with LLaVA (7B) and existing MSLMs of similar model sizes.
