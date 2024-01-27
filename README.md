@@ -38,7 +38,7 @@ If you use our model or refer our work in your studies, please cite:
 
 ```bibtex
 @misc{imp2024,
-  author = {Shao, Zhenwei and Yu, Zhou and Ouyang, Xuecheng and Yu, Jun},
+  author = {Shao, Zhenwei and Ouyang, Xuecheng and Yu, Zhou and Yu, Jun},
   title = {Imp-v1: An emprical study of multimodal small language models},
   year = {2024},
   url = {https://huggingface.co/MILVLG/imp-v1-3b}
