@@ -31,3 +31,16 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](https:
 
 ## About us
 This project is maintained by the [MILVLG](https://github.com/MILVLG)@Hangzhou Dianzi University (HDU) led by Prof. Zhou Yu and Jun Yu, and is mainly developed by Zhenwei Shao and Xuecheng Ouyang. We hope our model may serve as a strong baseline to inspire future research on MSLM, as well as its derivative applications on mobile devices and robots. 
+
+## Citation
+
+If you use our model or refer our work in your studies, please cite:
+
+```bibtex
+@misc{imp2024,
+  author = {Shao, Zhenwei and Yu, Zhou and Ouyang, Xuecheng and Yu, Jun},
+  title = {Imp-v1: An emprical study of multimodal small language models},
+  year = {2024},
+  url = {https://huggingface.co/MILVLG/imp-v1-3b}
+}
+```
