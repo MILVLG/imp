@@ -5,7 +5,7 @@
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;——*George R.R. Martin, A Clash of Kings*
 
 
-\[Technical report (coming soon)\]&nbsp;&nbsp;[[Demo](https://xmbot,net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]
+\[Technical report (coming soon)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]
 
 
 The Imp project aims to provide a family of  a strong multimodal `small` language models (MSLMs). Our `imp-v1-3b` is a strong MSLM with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set.  
