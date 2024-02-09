@@ -1,4 +1,4 @@
-# 😈 imp
+# 😈 Imp
 
 > A very small man can cast a very large shadow.
 > 
@@ -8,7 +8,7 @@
 \[Technical report (coming soon)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]
 
 
-This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of  a strong multimodal small language models (MSLMs). Our `imp-v1-3b` is a strong MSLM with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set.  
+This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of a strong multimodal small language models (MSLMs). Our `imp-v1-3b` is a strong MSLM with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set.  
 
 As shown in the [Evaluation](#evaluation), `imp-v1-3b` significantly outperforms the counterparts of similar model sizes, and even achieves slightly better performance than the strong LLaVA-7B model on various multimodal benchmarks. 
 
@@ -35,6 +35,7 @@ git clone https://github.com/MILVLG/imp.git
 cd imp
 ```
 2. Install Package
+
 We recommend using [Anaconda](https://www.anaconda.com/) to create a new environment for the project, and install the requirements with the following commands:
 ``` shell
 conda create -n imp python=3.10 -y
@@ -42,7 +43,7 @@ conda activate imp
 pip install -r requirements.txt
 pip install flash-attn==2.4.2 --no-build-isolation
 ```
-3. (Optional) Manually download the pretrained model repositories, i.e., [google/siglip-so400m-patch14-384](https://huggingface.co/google/siglip-so400m-patch14-384) and [microsoft/phi-2](https://huggingface.co/microsoft/phi-2) to your local directories and modify the corresponding paths in training and evaluation scripts.
+3. (Optional) Manually download the pretrained model repositories, i.e., [google/siglip-so400m-patch14-384](https://huggingface.co/google/siglip-so400m-patch14-384) and [microsoft/phi-2](https://huggingface.co/microsoft/phi-2) to your local directories and modify the corresponding paths in the training and evaluation scripts, respectively.
 
 ## Training
 The training pipeline and datasets of `imp-v1-3b` are directly inherited from [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA). The training  
@@ -62,7 +63,7 @@ Please download the caption annotations `blip_laion_cc_sbu_558k.json` and images
 bash scripts/pretrain.sh
 ```
 
-After that, a checkpoint of the multimodal projector will be stored in `./checkpoints/imp-v1-3b-pretrain`.
+After that, a checkpoint file of the multimodal projector will be stored in `./checkpoints/imp-v1-3b-pretrain`.
 
 ### Stage-2: Multimodal instruction tuning
 
@@ -93,7 +94,7 @@ datasets
         └── VG_100K_2
 ```
 
-Then start the training process with the following command:
+Then, you can start the training process with the following command:
 
 ``` shell
 bash scripts/finetune_lora.sh
@@ -106,13 +107,13 @@ You will get a trained model (a LoRA diff if you use `finetune_lora.sh`) under `
 ## Evaluation
 We follow the evaluation of [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA/tree/main) and conduct experiments on 9 commonly-used benchmarks, including 5 academic VQA benchmarks and 4 popular MLLM benchmarks. All evaluation scripts are placed in the `scripts/eval` folder. 
 
-Before preparing task-specific data, you should download [eval.zip](https://drive.google.com/file/d/1atZSBBrAX54yYpxtVVW33zFvcnaHeFPy/view?usp=sharing) and extract to `./playground/data/eval`. For more specific instructions, please refer to [LLaVA's Evaluation.md](https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md). 
+Before preparing task-specific data, you should download [eval.zip](https://drive.google.com/file/d/1atZSBBrAX54yYpxtVVW33zFvcnaHeFPy/view?usp=sharing) and unzip it to `./playground/data/eval`. For more specific instructions, please refer to [LLaVA's Evaluation.md](https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md). 
 
-It is supported to evaluate your own trained checkpoints or our official released `imp-v1-3b` at [Huggingface Hub](https://huggingface.co/MILVLG/imp-v1-3b/). 
+It is supported to evaluate your own trained model checkpoints or our released `imp-v1-3b` model at [Huggingface Hub](https://huggingface.co/MILVLG/imp-v1-3b/). 
 
-See [Evaluation.md](./docs/Evaluation.md).
+For more detailed evaluation scripts, please See [Evaluation.md](./docs/Evaluation.md).
 
-Using the script in `Evaluation.md`, we obtain our Imp model's accuracies in the following table, Compare with LLaVA (7B) and existing MSLMs of similar model sizes.
+Using the provided model ckpts, you can reproduce the following results. Our `imp-v1-3b` model significantly outperforms existing MSLMs of similar model sizes, and is comparable with the strong LLaVA-v1.5-7b model. 
 
 | Models | VQAv2 | GQA |VizWiz  | SQA(IMG) | TextVQA | POPE |  MME(P) | MMB  |MM-Vet|
 |:--------:|:----:|:----:|:-------------:|:--------:|:-----:|:----:|:-------:|:-------:|:-------:|
