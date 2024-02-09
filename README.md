@@ -15,7 +15,7 @@ As shown in the [Evaluation](#evaluation), `imp-v1-3b` significantly outperforms
 We also release the model weights a running example of `imp-v1-3b` on [Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/). Technical report will be released soon. We will persistently improve our model and release the next versions to further improve model performance :)
 
 ## Updates
-- February 7, 2024: Training and evaluation codes of `imp-v1-3b` are released.
+- February 9, 2024: Training and evaluation codes of `imp-v1-3b` are released.
 
 ## Table of Contents
 
