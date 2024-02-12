@@ -814,7 +814,7 @@ def train():
 
     if model_args.vision_tower is not None:
         if 'phi' in model_args.model_name_or_path:
-            config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             # config.flash_attn = True
             # config.flash_rotary = True
             model = ImpForCausalLM.from_pretrained(
