@@ -19,6 +19,19 @@ class ImpConfig(PhiConfig):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.activation_function = getattr(self, 'hidden_act', 'gelu_new')
+        self.attn_pdrop = getattr(self, 'attention_dropout', 0.0)
+        self.layer_norm_epsilon = getattr(self, 'layer_norm_eps', 1e-5)
+        self.n_embd = getattr(self, 'hidden_size', 2560)
+        self.n_head = getattr(self, 'num_attention_heads', 32)
+        self.n_layer = getattr(self, 'num_hidden_layers', 32)
+        self.n_positions = getattr(self, 'max_position_embeddings', 2048)
+        self.flash_attn = getattr(self, 'flash_attn', False)
+        self.flash_rotary = getattr(self, 'flash_rotary', False)
+        self.fused_dense = getattr(self, 'fused_dense', False)
+        self.n_head_kv = getattr(self, 'num_key_value_heads', None)
+        self.n_inner = getattr(self, 'intermediate_size', None)
+        self.rotary_dim = 32
         # self.image_token_index = getattr(self, "image_token_index", 50296)
         # self.image_token = getattr(self, "image_token", "<image>")
 
