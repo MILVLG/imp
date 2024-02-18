@@ -5,7 +5,7 @@
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;——*George R.R. Martin, A Clash of Kings*
 
 
-\[Technical report (coming soon)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]
+\[Technical report (coming soon)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]&nbsp;&nbsp;[[Colab](https://colab.research.google.com/drive/1EBYky6xIPjnlPppo2gZaiNK6gEsjXgom?usp=drive_link#scrollTo=2-VpU6QzWCVZ)\]
 
 
 This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of a strong multimodal small language models (MSLMs). Our `imp-v1-3b` is a strong MSLM with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set.  
@@ -20,7 +20,7 @@ We also release the model weights a running example of `imp-v1-3b` on [Huggingfa
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Usage](#usage)
+- [ModelCard](#ModelCard)
 - [Training](#training)
 - [Evaluation](#evaluation)
 - [License](#license)
@@ -43,12 +43,16 @@ conda activate imp
 pip install -r requirements.txt
 pip install flash-attn==2.4.2 --no-build-isolation
 ```
-3. (Optional) Manually download the pretrained model repositories, i.e., [google/siglip-so400m-patch14-384](https://huggingface.co/google/siglip-so400m-patch14-384) and [microsoft/phi-2](https://huggingface.co/microsoft/phi-2) to your local directories and modify the corresponding paths in the training and evaluation scripts, respectively.
+
+## ModelCard
+All of checkpoints different Imp models are provided in [Model_Card.md](./docs/Model_Card.md) .
 
 ## Training
 The training pipeline and datasets of `imp-v1-3b` are directly inherited from [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA). The training  
 - *Multimodal pretraining*: train a projector on a subset of ∼558K image-text pairs to connect a frozen pretrained vision encoder and a frozen LLM.
 - *Multimodal instruction tuning*: fine-tune the projector and LoRA in the LLM with multimodal instruction data and VQA-formatted data to empower the MLSM the ability of multimodal instruction following.
+
+Before start training, download the base models, i.e., Siglip and Phi-2. See [Model Card.md](./docs/Model_Card.md) for details.
 
 Imp is trained on 8 A100 (40G) GPUs. You can reduce the `per_device_train_batch_size` and increase the `gradient_accumulation_steps` to match your resources. .But always keep the global batch size the same: `global_batch_size ` = `per_device_train_batch_size` $`\times`$ `gradient_accumulation_steps` $`\times`$ `num_gpus`.
 
@@ -63,7 +67,7 @@ Please download the caption annotations `blip_laion_cc_sbu_558k.json` and images
 bash scripts/pretrain.sh
 ```
 
-After that, a checkpoint file of the multimodal projector will be stored in `./checkpoints/imp-v1-3b-pretrain`.
+After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b-stage1`.
 
 ### Stage-2: Multimodal instruction tuning
 
@@ -94,14 +98,30 @@ datasets
         └── VG_100K_2
 ```
 
-Then, you can start the training process with the following command:
+Then, you can start the training process by the following script. If you use your custom dataset, you can refer to `llava_v1_5_mix665k.json` to format your data.
 
 ``` shell
 bash scripts/finetune_lora.sh
 # bash scripts/finetune.sh # fully finetuning is not recommended
 ```
 You will get a trained model (a LoRA diff if you use `finetune_lora.sh`) under `./checkpoints/` when the training is done.
+
+### 3.(Optional) Merging Models
+You can use `merge.sh` merge lora weights and base model for evaluation and finetune own custom dataset.
+
+``` shell
+bash scripts/merge.sh
+```
+After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b-merge`.
+
+### 4.(Optional) Finetuning on Custom Dataset
+You also can finetune Imp in your own custom dataset use `finetune_lora_custom.sh`.
+
+``` shell
+bash scripts/finetune_lora_custom.sh
+```
 </details>
+
 
 
 ## Evaluation

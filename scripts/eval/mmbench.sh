@@ -11,8 +11,10 @@ IFS=',' read -ra GPULIST <<< "$gpu_list"
 CHUNKS=${#GPULIST[@]}
 
 SPLIT="mmbench_dev"
+
+# merge eval
 MODEL_CKPT="milvlg/imp-v1-3b"
-# MODEL_CKPT="imp-v1-3b-lora" # eval your own checkpoint
+# MODEL_CKPT="imp-v1-3b-merge" # eval your own checkpoint
 EVAL_CKPT="${MODEL_CKPT//\//_}_1"
 MODEL_PATH=$MODEL_CKPT
 # MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
@@ -28,8 +30,28 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
         --conv-mode phi2 &
 done
 
-
 wait
+
+
+# lora eval
+# MODEL_CKPT="imp-v1-3b-lora"
+# EVAL_CKPT="${MODEL_CKPT//\//_}_1"
+# MODEL_BASE=./checkpoints/base/phi-2
+
+# for IDX in $(seq 0 $((CHUNKS-1))); do
+#     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
+#         --model-path ./checkpoints/$MODEL_CKPT \
+#         --model-base $MODEL_BASE  \
+#         --question-file ./playground/data/eval/mmbench/mmbench_dev_20230712.tsv \
+#         --answers-file ./playground/data/eval/mmbench/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
+#         --num-chunks $CHUNKS \
+#         --chunk-idx $IDX \
+#         --temperature 0 \
+#         --conv-mode phi2 &
+# done
+
+# wait
+
 
 output_file=./playground/data/eval/mmbench/answers/$SPLIT/$EVAL_CKPT/merge.jsonl
 
