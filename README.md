@@ -43,11 +43,11 @@ pip install -r requirements.txt
 pip install flash-attn==2.4.2 --no-build-isolation
 ```
 
-3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. **Note that the latest version of the Phi-2 model is not compatible with this repository. We strongly recommend using the following script to download the base models.** 
+3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. **Note that the latest version of the Phi-2 model is not compatible with this repository. We strongly recommend using the following script to download the specific versions of the base models.** 
 ``` shell
 python scripts/download_models.py
 ```
-The models will be stored in `checkpoints/base` in default.
+The base models will be stored in `checkpoints/base` in default.
 ```
 checkpoints
 └── base
@@ -55,7 +55,7 @@ checkpoints
     └── phi-2
 ```
 ## Model-zoo
-All of checkpoints different Imp models are provided in [Model_Zoo.md](./docs/Model_Zoo.md) .
+The checkpoints of different Imp models are provided in [Model_Zoo.md](./docs/Model_Zoo.md) .
 
 ## Training
 The training pipeline and datasets of `imp-v1-3b` are directly inherited from [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA). The training  
