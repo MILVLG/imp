@@ -5,7 +5,7 @@
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;——*George R.R. Martin, A Clash of Kings*
 
 
-\[Technical report (coming soon)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]
+\[Technical report (coming soon)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]&nbsp;&nbsp;[[Colab](https://colab.research.google.com/drive/1EBYky6xIPjnlPppo2gZaiNK6gEsjXgom?usp=drive_link#scrollTo=2-VpU6QzWCVZ)\]
 
 
 This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of a strong multimodal small language models (MSLMs). Our `imp-v1-3b` is a strong MSLM with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set.  
@@ -20,12 +20,11 @@ We also release the model weights a running example of `imp-v1-3b` on [Huggingfa
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Usage](#usage)
+- [Model Zoo](#Model Zoo)
 - [Training](#training)
 - [Evaluation](#evaluation)
 - [License](#license)
 - [Citation](#citation)
-<!-- - [Acknowledgement](#acknowledgement) -->
 
 ## Prerequisites
 
@@ -43,7 +42,20 @@ conda activate imp
 pip install -r requirements.txt
 pip install flash-attn==2.4.2 --no-build-isolation
 ```
-3. (Optional) Manually download the pretrained model repositories, i.e., [google/siglip-so400m-patch14-384](https://huggingface.co/google/siglip-so400m-patch14-384) and [microsoft/phi-2](https://huggingface.co/microsoft/phi-2) to your local directories and modify the corresponding paths in the training and evaluation scripts, respectively.
+
+3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. **Note that the latest version of the Phi-2 model is not compatible with this repository, which means you MUST use the following script to download the models rather than the automatic downloaded ones by Hugging Face.** 
+``` shell
+python scripts/download_models.py
+```
+The models will be stored in `checkpoints/base` in default.
+```
+checkpoints
+└── base
+    └── siglip-so400m-patch14-384
+    └── phi-2
+```
+## Model zoo
+All of checkpoints different Imp models are provided in [Model_Zoo.md](./docs/Model_Zoo.md) .
 
 ## Training
 The training pipeline and datasets of `imp-v1-3b` are directly inherited from [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA). The training  
@@ -63,7 +75,7 @@ Please download the caption annotations `blip_laion_cc_sbu_558k.json` and images
 bash scripts/pretrain.sh
 ```
 
-After that, a checkpoint file of the multimodal projector will be stored in `./checkpoints/imp-v1-3b-pretrain`.
+After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b-stage1`.
 
 ### Stage-2: Multimodal instruction tuning
 
@@ -94,14 +106,30 @@ datasets
         └── VG_100K_2
 ```
 
-Then, you can start the training process with the following command:
+Then, you can start the training process by the following script. If you use your custom dataset, you can refer to `llava_v1_5_mix665k.json` to format your data.
 
 ``` shell
 bash scripts/finetune_lora.sh
 # bash scripts/finetune.sh # fully finetuning is not recommended
 ```
-You will get a trained model (a LoRA diff if you use `finetune_lora.sh`) under `./checkpoints/` when the training is done.
+You will get a trained model `imp-v1-3b-stage2-lora` (a LoRA diff if you use `finetune_lora.sh`) under `./checkpoints/` when the training is done.
+
+### Submodel merging
+After the above model training, the model checkpoint consists of multiple sub-models. You can use the following script to merge the sub-models into a single one for model release. Our evaluation script supports both the sub-models and merge model. **However, if you want to fine-tune the model on your own custom dataset, only the merged model is supported.** 
+
+``` shell
+bash scripts/merge.sh
+```
+After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b`.
+
+### Finetuning on Custom Dataset
+You also can finetune Imp in your own custom dataset use `finetune_lora_custom.sh`.
+
+``` shell
+bash scripts/finetune_lora_custom.sh
+```
 </details>
+
 
 
 ## Evaluation

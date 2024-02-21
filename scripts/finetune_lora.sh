@@ -12,12 +12,12 @@ export IMP_SILIENT_OTHERS=true
 deepspeed imp_llava/train/train_mem.py \
     --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed ./scripts/zero3.json \
-    --model_name_or_path microsoft/phi-2 \
+    --model_name_or_path checkpoints/base/phi-2 \
     --version phi2 \
     --data_path datasets/llava_v1_5_mix665k.json \
     --image_folder datasets/finetune_images \
-    --vision_tower google/siglip-so400m-patch14-384 \
-    --pretrain_mm_mlp_adapter ./checkpoints/imp-v1-3b-pretrain/mm_projector.bin \
+    --vision_tower checkpoints/base/siglip-so400m-patch14-384 \
+    --pretrain_mm_mlp_adapter ./checkpoints/imp-v1-3b-stage1/mm_projector.bin \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
@@ -26,7 +26,7 @@ deepspeed imp_llava/train/train_mem.py \
     --group_by_modality_length True \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/imp-v1-3b-lora \
+    --output_dir ./checkpoints/imp-v1-3b-stage2-lora \
     --num_train_epochs 1 \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \

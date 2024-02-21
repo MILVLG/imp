@@ -13,15 +13,37 @@ IFS=',' read -ra GPULIST <<< "$gpu_list"
 CHUNKS=${#GPULIST[@]}
 
 SPLIT="llava_vqav2_mscoco_test-dev2015"
-MODEL_CKPT="milvlg/imp-v1-3b"
-# MODEL_CKPT="imp-v1-3b-lora" # eval your own checkpoint
+
+# # merge eval
+# MODEL_CKPT="milvlg/imp-v1-3b"
+# # MODEL_CKPT="imp-v1-3b" # eval your own checkpoint
+# EVAL_CKPT="${MODEL_CKPT//\//_}_1"
+# MODEL_PATH=$MODEL_CKPT
+# # MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
+
+# for IDX in $(seq 0 $((CHUNKS-1))); do
+#     LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
+#         --model-path $MODEL_PATH \
+#         --question-file ./playground/data/eval/vqav2/$SPLIT.jsonl \
+#         --image-folder  ./playground/data/eval/vqav2/test2015 \
+#         --answers-file ./playground/data/eval/vqav2/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
+#         --num-chunks $CHUNKS \
+#         --chunk-idx $IDX \
+#         --temperature 0 \
+#         --conv-mode phi2 &
+# done
+
+# wait
+
+# lora eval
+MODEL_CKPT="imp-v1-3b-stage2-lora"
 EVAL_CKPT="${MODEL_CKPT//\//_}_1"
-MODEL_PATH=$MODEL_CKPT
-# MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
+MODEL_BASE=checkpoints/base/phi-2
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
-    LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
-        --model-path $MODEL_PATH \
+    CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
+        --model-path ./checkpoints/$MODEL_CKPT \
+        --model-base $MODEL_BASE  \
         --question-file ./playground/data/eval/vqav2/$SPLIT.jsonl \
         --image-folder  ./playground/data/eval/vqav2/test2015 \
         --answers-file ./playground/data/eval/vqav2/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
@@ -32,6 +54,7 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
 done
 
 wait
+
 
 output_file=./playground/data/eval/vqav2/answers/$SPLIT/$EVAL_CKPT/merge.jsonl
 
