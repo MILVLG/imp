@@ -1,4 +1,5 @@
-import os
+import os, sys
+sys.path.append('./')
 import argparse
 import json
 

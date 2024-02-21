@@ -9,7 +9,7 @@ export IMP_SILIENT_OTHERS=true
 # if not use all GPUs 
 # deepspeed --include localhost:0,1,2,3 --master_port 29600
 IMP_MODEL='milvlg/imp-v1-3b'
-# IMP_MODEL='./checkpoints/imp-v1-3b-merge'  #eval your own checkpoint
+# IMP_MODEL='./checkpoints/imp-v1-3b'  #finestune your own checkpoint
 
 deepspeed imp_llava/train/train_mem.py \
     --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
@@ -18,7 +18,7 @@ deepspeed imp_llava/train/train_mem.py \
     --version phi2 \
     --data_path your/data/path.json \
     --image_folder your/image/path \
-    --vision_tower ./checkpoints/base/siglip-so400m-patch14-384 \
+    --vision_tower checkpoints/base/siglip-so400m-patch14-384 \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
@@ -27,7 +27,7 @@ deepspeed imp_llava/train/train_mem.py \
     --group_by_modality_length True \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/imp-v1-3b-lora_custom \
+    --output_dir ./checkpoints/imp-v1-3b-satge2-custom \
     --num_train_epochs 1 \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \

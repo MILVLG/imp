@@ -11,11 +11,11 @@ export IMP_SILIENT_OTHERS=true
 
 deepspeed imp_llava/train/train_mem.py \
     --deepspeed ./scripts/zero2.json \
-    --model_name_or_path ./checkpoints/base/phi-2 \
+    --model_name_or_path checkpoints/base/phi-2 \
     --version plain \
     --data_path datasets/blip_laion_cc_sbu_558k.json \
     --image_folder datasets/pretrain_images/ \
-    --vision_tower ./checkpoints/base/siglip-so400m-patch14-384 \
+    --vision_tower checkpoints/base/siglip-so400m-patch14-384 \
     --mm_projector_type mlp2x_gelu \
     --tune_mm_mlp_adapter True \
     --mm_vision_select_layer -2 \
@@ -23,7 +23,7 @@ deepspeed imp_llava/train/train_mem.py \
     --mm_use_im_patch_token False \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/imp-v1-3b-pretrain \
+    --output_dir ./checkpoints/imp-v1-3b-stage1 \
     --num_train_epochs 1 \
     --per_device_train_batch_size 32 \
     --per_device_eval_batch_size 4 \

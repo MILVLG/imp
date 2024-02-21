@@ -20,12 +20,11 @@ We also release the model weights a running example of `imp-v1-3b` on [Huggingfa
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [ModelCard](#ModelCard)
+- [Model Zoo](#Model Zoo)
 - [Training](#training)
 - [Evaluation](#evaluation)
 - [License](#license)
 - [Citation](#citation)
-<!-- - [Acknowledgement](#acknowledgement) -->
 
 ## Prerequisites
 
@@ -44,15 +43,24 @@ pip install -r requirements.txt
 pip install flash-attn==2.4.2 --no-build-isolation
 ```
 
-## ModelCard
-All of checkpoints different Imp models are provided in [Model_Card.md](./docs/Model_Card.md) .
+3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. **Note that the latest version of the Phi-2 model is not compatible with this repository, which means you MUST use the following script to download the models rather than the automatic downloaded ones by Hugging Face.** 
+``` shell
+python scripts/download_models.py
+```
+The models will be stored in `checkpoints/base` in default.
+```
+checkpoints
+└── base
+    └── siglip-so400m-patch14-384
+    └── phi-2
+```
+## Model zoo
+All of checkpoints different Imp models are provided in [Model_Zoo.md](./docs/Model_Zoo.md) .
 
 ## Training
 The training pipeline and datasets of `imp-v1-3b` are directly inherited from [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA). The training  
 - *Multimodal pretraining*: train a projector on a subset of ∼558K image-text pairs to connect a frozen pretrained vision encoder and a frozen LLM.
 - *Multimodal instruction tuning*: fine-tune the projector and LoRA in the LLM with multimodal instruction data and VQA-formatted data to empower the MLSM the ability of multimodal instruction following.
-
-Before start training, download the base models, i.e., Siglip and Phi-2. See [Model Card.md](./docs/Model_Card.md) for details.
 
 Imp is trained on 8 A100 (40G) GPUs. You can reduce the `per_device_train_batch_size` and increase the `gradient_accumulation_steps` to match your resources. .But always keep the global batch size the same: `global_batch_size ` = `per_device_train_batch_size` $`\times`$ `gradient_accumulation_steps` $`\times`$ `num_gpus`.
 
@@ -104,17 +112,17 @@ Then, you can start the training process by the following script. If you use you
 bash scripts/finetune_lora.sh
 # bash scripts/finetune.sh # fully finetuning is not recommended
 ```
-You will get a trained model (a LoRA diff if you use `finetune_lora.sh`) under `./checkpoints/` when the training is done.
+You will get a trained model `imp-v1-3b-stage2-lora` (a LoRA diff if you use `finetune_lora.sh`) under `./checkpoints/` when the training is done.
 
-### 3.(Optional) Merging Models
-You can use `merge.sh` merge lora weights and base model for evaluation and finetune own custom dataset.
+### Submodel merging
+After the above model training, the model checkpoint consists of multiple sub-models. You can use the following script to merge the sub-models into a single one for model release. Our evaluation script supports both the sub-models and merge model. **However, if you want to fine-tune the model on your own custom dataset, only the merged model is supported.** 
 
 ``` shell
 bash scripts/merge.sh
 ```
-After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b-merge`.
+After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b`.
 
-### 4.(Optional) Finetuning on Custom Dataset
+### Finetuning on Custom Dataset
 You also can finetune Imp in your own custom dataset use `finetune_lora_custom.sh`.
 
 ``` shell
