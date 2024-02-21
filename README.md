@@ -137,11 +137,9 @@ We follow the evaluation of [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA/tr
 
 Before preparing task-specific data, you should download [eval.zip](https://drive.google.com/file/d/1atZSBBrAX54yYpxtVVW33zFvcnaHeFPy/view?usp=sharing) and unzip it to `./playground/data/eval`. For more specific instructions, please refer to [LLaVA's Evaluation.md](https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md). 
 
-It is supported to evaluate your own trained model checkpoints or our released `imp-v1-3b` model at [Huggingface Hub](https://huggingface.co/MILVLG/imp-v1-3b/). 
+It is supported to evaluate your reproduced model checkpoints or our released model. For more detailed evaluation scripts, please refer to [Evaluation.md](./docs/Evaluation.md).
 
-For more detailed evaluation scripts, please See [Evaluation.md](./docs/Evaluation.md).
-
-Using the provided model ckpts, you can reproduce the following results. Our `imp-v1-3b` model significantly outperforms existing MSLMs of similar model sizes, and is comparable with the strong LLaVA-v1.5-7b model. 
+Using our provided model, you can reproduce the following results. Our `imp-v1-3b` model significantly outperforms existing MSLMs of similar model sizes, and is comparable with the strong LLaVA-v1.5-7b model. 
 
 | Models | VQAv2 | GQA |VizWiz  | SQA(IMG) | TextVQA | POPE |  MME(P) | MMB  |MM-Vet|
 |:--------:|:----:|:----:|:-------------:|:--------:|:-----:|:----:|:-------:|:-------:|:-------:|
