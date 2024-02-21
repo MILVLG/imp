@@ -20,7 +20,7 @@ We also release the model weights a running example of `imp-v1-3b` on [Huggingfa
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Model Zoo](#Model Zoo)
+- [Model Zoo](#model-zoo)
 - [Training](#training)
 - [Evaluation](#evaluation)
 - [License](#license)
@@ -43,7 +43,7 @@ pip install -r requirements.txt
 pip install flash-attn==2.4.2 --no-build-isolation
 ```
 
-3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. **Note that the latest version of the Phi-2 model is not compatible with this repository, which means you MUST use the following script to download the models rather than the automatic downloaded ones by Hugging Face.** 
+3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. **Note that the latest version of the Phi-2 model is not compatible with this repository. We strongly recommend using the following script to download the base models.** 
 ``` shell
 python scripts/download_models.py
 ```
@@ -54,7 +54,7 @@ checkpoints
     └── siglip-so400m-patch14-384
     └── phi-2
 ```
-## Model zoo
+## Model-zoo
 All of checkpoints different Imp models are provided in [Model_Zoo.md](./docs/Model_Zoo.md) .
 
 ## Training
@@ -115,15 +115,15 @@ bash scripts/finetune_lora.sh
 You will get a trained model `imp-v1-3b-stage2-lora` (a LoRA diff if you use `finetune_lora.sh`) under `./checkpoints/` when the training is done.
 
 ### Submodel merging
-After the above model training, the model checkpoint consists of multiple sub-models. You can use the following script to merge the sub-models into a single one for model release. Our evaluation script supports both the sub-models and merge model. **However, if you want to fine-tune the model on your own custom dataset, only the merged model is supported.** 
+After the above model training, the model checkpoint consists of multiple sub-models. You can use the following script to merge the stage2 sub-models into a single one for release. Our evaluation script supports both the sub-models and merged model checkpoints. **However, if you want to fine-tune the model on your own custom dataset, only the merged model is supported.** 
 
 ``` shell
 bash scripts/merge.sh
 ```
 After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b`.
 
-### Finetuning on Custom Dataset
-You also can finetune Imp in your own custom dataset use `finetune_lora_custom.sh`.
+### Finetuning on custom datasets
+You also can finetune Imp using your own custom dataset use `finetune_lora_custom.sh`. The custom dataset should be in the LLaVA-1.5 format.    
 
 ``` shell
 bash scripts/finetune_lora_custom.sh
