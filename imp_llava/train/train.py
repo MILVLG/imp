@@ -813,7 +813,7 @@ def train():
     vision_tower = build_vision_tower(model_args)
 
     if model_args.vision_tower is not None:
-        if 'phi' in model_args.model_name_or_path:
+        if 'phi' in model_args.model_name_or_path or 'imp' in model_args.model_name_or_path:
             config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             # config.flash_attn = True
             # config.flash_rotary = True
