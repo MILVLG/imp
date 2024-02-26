@@ -10,7 +10,7 @@ from imp_llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN, DEFAULT_
 from imp_llava.conversation import conv_templates, SeparatorStyle
 from imp_llava.model.builder import load_pretrained_model
 from imp_llava.utils import disable_torch_init
-from imp_llava.mm_utils import tokenizer_image_token, process_images, load_image_from_base64, get_model_name_from_path
+from imp_llava.mm_utils import tokenizer_image_token, process_images, load_image_from_base64, get_model_name_from_path,KeywordsStoppingCriteria
 
 from PIL import Image
 import math
@@ -58,6 +58,8 @@ def eval_model(args):
     model_name = get_model_name_from_path(model_path)
     tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
 
+    keywords = ['</s>']
+
     questions = pd.read_table(os.path.expanduser(args.question_file))
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
     answers_file = os.path.expanduser(args.answers_file)
@@ -104,6 +106,7 @@ def eval_model(args):
             prompt = conv.get_prompt()
 
             input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).cuda()
+            stopping_criteria = KeywordsStoppingCriteria(keywords, tokenizer, input_ids)
 
             image_tensor = process_images([image], image_processor, model.config)[0]
             # image_tensor = image_processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
@@ -119,6 +122,7 @@ def eval_model(args):
                     top_p=args.top_p,
                     num_beams=args.num_beams,
                     # no_repeat_ngram_size=3,
+                    stopping_criteria=[stopping_criteria],
                     max_new_tokens=1024,
                     use_cache=True)
 

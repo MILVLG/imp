@@ -33,6 +33,8 @@ def eval_model(args):
     model_name = get_model_name_from_path(model_path)
     tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
 
+    keywords = ['</s>']
+
     questions = json.load(open(os.path.expanduser(args.question_file), "r"))
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
     answers_file = os.path.expanduser(args.answers_file)
@@ -69,8 +71,8 @@ def eval_model(args):
         input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).cuda()
 
         stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
-        keywords = [stop_str]
-        stopping_criteria = [KeywordsStoppingCriteria(keywords, tokenizer, input_ids)] if conv.version == "v0" else None
+        # keywords = [stop_str]
+        stopping_criteria = [KeywordsStoppingCriteria(keywords, tokenizer, input_ids)]
 
         with torch.inference_mode():
             output_ids = model.generate(
@@ -88,9 +90,9 @@ def eval_model(args):
         if n_diff_input_output > 0:
             print(f'[Warning] {n_diff_input_output} output_ids are not the same as the input_ids')
         outputs = tokenizer.batch_decode(output_ids[:, input_token_len:], skip_special_tokens=True)[0]
-        outputs = outputs.strip()
-        if outputs.endswith(stop_str):
-            outputs = outputs[:-len(stop_str)]
+        # outputs = outputs.strip()
+        # if outputs.endswith(stop_str):
+        #     outputs = outputs[:-len(stop_str)]
         outputs = outputs.strip()
 
         # prompt for answer

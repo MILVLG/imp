@@ -24,7 +24,7 @@ SPLIT="llava_pope"
 #         --model-path $MODEL_PATH \
 #         --question-file ./playground/data/eval/pope/llava_pope_test.jsonl \
 #         --image-folder  ./playground/data/eval/pope/val2014 \
-#         --answers-file ./playground/data/eval/pope/answers/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl \
+#         --answers-file ./playground/data/eval/pope/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
 #         --num-chunks $CHUNKS \
 #         --chunk-idx $IDX \
 #         --temperature 0 \
@@ -44,7 +44,7 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
         --model-base $MODEL_BASE  \
         --question-file ./playground/data/eval/pope/llava_pope_test.jsonl \
         --image-folder  ./playground/data/eval/pope/val2014 \
-        --answers-file ./playground/data/eval/pope/answers/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl \
+        --answers-file ./playground/data/eval/pope/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
         --temperature 0 \

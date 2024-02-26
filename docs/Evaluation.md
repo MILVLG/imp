@@ -55,7 +55,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/v1_5/eval/gqa.sh
 ```Shell
 CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/v1_5/eval/sqa.sh
 ```
-
+3. (Optional) We follow multiple-choice's prompt in [LLaVA's Evaluation.md](https://github.com/haotian-liu/LLaVA/blob/main/docs/Evaluation.md) rewriting a question file [scienceqa_multi.jsonl](https://drive.google.com/file/d/1SU7tEuXUENnvXowGkFVcEa5dsVPlMsD9/view?usp=drive_link) which gets a better result than `llava_test_CQM-A.json`. Please replace `imp_llava.eval.model_vqa_science` into `imp_llava.eval.model_vqa_loader` in `sqa.sh` while use `scienceqa_multi.jsonl` for Evaluation
 ### TextVQA
 
 1. Download [`TextVQA_0.5.1_val.json`](https://dl.fbaipublicfiles.com/textvqa/data/TextVQA_0.5.1_val.json) and [images](https://dl.fbaipublicfiles.com/textvqa/images/train_val_images.zip) and extract to `./playground/data/eval/textvqa`.
