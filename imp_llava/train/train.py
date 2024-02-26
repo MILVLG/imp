@@ -28,7 +28,7 @@ if local_rank != "0" and local_rank is not None:
     sys.stderr = errfile
 
 def rank0_print(*args):
-    if local_rank == "0" or local_rank == "0" or local_rank is None:
+    if local_rank == "0" or local_rank == 0 or local_rank is None:
         print(*args)
 
 import copy
