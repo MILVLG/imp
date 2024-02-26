@@ -28,7 +28,7 @@ if local_rank != "0" and local_rank is not None:
     sys.stderr = errfile
 
 def rank0_print(*args):
-    if local_rank == "0":
+    if local_rank == "0" or local_rank == "0" or local_rank is None:
         print(*args)
 
 import copy
@@ -655,6 +655,9 @@ class LazySupervisedDataset(Dataset):
                  data_args: DataArguments):
         super(LazySupervisedDataset, self).__init__()
         list_data_dict = json.load(open(data_path, "r"))
+        if 'llava_v1_5_mix665k.json' in data_path:
+            del list_data_dict[247644]
+            del list_data_dict[245723]
 
         rank0_print("Formatting inputs...Skip in lazy mode")
         self.tokenizer = tokenizer
