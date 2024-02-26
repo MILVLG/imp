@@ -39,7 +39,7 @@ EVAL_CKPT="${MODEL_CKPT//\//_}_1"
 MODEL_BASE=checkpoints/base/phi-2
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
-    LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
+    CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_science \
         --model-path ./checkpoints/$MODEL_CKPT \
         --model-base $MODEL_BASE  \
         --question-file ./playground/data/eval/scienceqa/llava_test_CQM-A.json \

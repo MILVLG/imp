@@ -58,9 +58,11 @@ if __name__ == "__main__":
         if prob_id not in predictions:
             pred = {'text': 'FAILED', 'prompt': 'Unknown'}
             pred_text = 'FAILED'
+            is_multimodal=False
         else:
             pred = predictions[prob_id]
             pred_text = pred['text']
+            is_multimodal=True
 
         if pred_text in args.options:
             answer = pred_text
@@ -82,7 +84,7 @@ if __name__ == "__main__":
             'ground_truth': args.options[prob['answer']],
             'question': pred['prompt'],
             'pred': pred_text,
-            'is_multimodal': '<image>' in pred['prompt'],
+            'is_multimodal': is_multimodal, #'<image>' in pred['prompt'],
         }
 
         sqa_results['results'][prob_id] = get_pred_idx(answer, prob['choices'], args.options)
