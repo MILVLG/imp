@@ -27,7 +27,7 @@ deepspeed imp_llava/train/train_mem.py \
     --group_by_modality_length True \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/imp-v1-3b-satge2-custom \
+    --output_dir ./checkpoints/imp-v1-3b-satge3-custom \
     --num_train_epochs 1 \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \
