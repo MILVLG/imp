@@ -1,21 +1,17 @@
 # 😈 Imp
 
-> A very small man can cast a very large shadow.
-> 
-> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;——*George R.R. Martin, A Clash of Kings*
-
-
-\[Technical report (coming soon)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]
+[[Technical report](https://arxiv.org/abs/2405.12107)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/)\]
 
 
 This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of a strong multimodal small language models (MSLMs). Our `imp-v1-3b` is a strong MSLM with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set.  
 
 As shown in the [Evaluation](#evaluation), `imp-v1-3b` significantly outperforms the counterparts of similar model sizes, and even achieves slightly better performance than the strong LLaVA-7B model on various multimodal benchmarks. 
 
-We also release the model weights a running example of `imp-v1-3b` on [Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/). Technical report will be released soon. We will persistently improve our model and release the next versions to further improve model performance :)
+We also release the model weights a running example of `Imp-v1-3B` on [Huggingface](https://huggingface.co/MILVLG/imp-v1-3b/). Technical report will be released soon. We will persistently improve our model and release the next versions to further improve model performance :)
 
 ## Updates
-- February 9, 2024: Training and evaluation codes of `imp-v1-3b` are released.
+- May 21, 2024: The technical report and corresponding `Imp-v1.5-2B/3B/4B` model series are released.
+- February 9, 2024: Training and evaluation codes of the `Imp-v1-3B` model are released.
 
 ## Table of Contents
 
