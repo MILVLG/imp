@@ -19,6 +19,7 @@ We also release the model weights a running example of `Imp-v1-3B` on [Huggingfa
 - [Model Zoo](#model-zoo)
 - [Training](#training)
 - [Evaluation](#evaluation)
+- [Deployment](#deployment)
 - [License](#license)
 - [Citation](#citation)
 
@@ -145,6 +146,15 @@ Using our provided model, you can reproduce the following results. Our `imp-v1-3
 | [MobileVLM](https://github.com/Meituan-AutoML/MobileVLM) (3B) | - | 59.00  | - |    61.00   |    47.50   | 84.90 | 1288.9 | 59.60  |-|
 | [MC-LLaVA](https://huggingface.co/visheratin/MC-LLaVA-3b) (3B) | 64.24 | 49.60  | 24.88 |    -   |    38.59   | 80.59 | - | -  |-|
 | **Imp-v1 (3B, ours)** | **79.45**  | 58.55 | **50.09** |**69.96**| **59.38** | **88.02**| 1434.0 | **66.49**  |**33.1**|
+
+## Deployment
+Based on MLC-LLM, we provide a lightweight deployment solution so that imp can inference efficiently on the mobile device.
+
+  - After **4-bit** quantification, imp only takes up about **1.9G** of storage space and is fully capable of running on mobile phones.
+  - All **Android** devices are supported and **IOS** will come soon.
+  - **Textual** and **visual** modalities are supported.
+
+  More details can be found in [MILVLG/mlc-imp](https://github.com/MILVLG/mlc-imp).
 
 ## License
 This project is licensed under the Apache License 2.0 - see the [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) file for details.
