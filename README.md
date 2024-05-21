@@ -167,10 +167,10 @@ This project is maintained by the [MILVLG](https://github.com/MILVLG)@Hangzhou D
 If you use our model or refer our work in your studies, please cite:
 
 ```bibtex
-@misc{imp2024,
-  author = {Shao, Zhenwei and Ouyang, Xuecheng and Gai, Zhenbiao and Yu, Zhou and Yu, Jun},
-  title = {Imp: An emprical study of multimodal small language models},
-  year = {2024},
-  url = {https://huggingface.co/MILVLG/imp-v1-3b}
+@article{imp2024,
+  title={Imp: Highly Capable Large Multimodal Models for Mobile Devices},
+  author={Shao, Zhenwei and Yu, Zhou and Yu, Jun and Ouyang, Xuecheng and Lihao, Zheng and Zhenbiao, Gai and Mingyang, Wang and Jiajun, Ding},
+  journal={arXiv preprint arXiv:2405.12107},
+  year={2024}
 }
 ```
