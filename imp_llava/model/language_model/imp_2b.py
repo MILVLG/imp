@@ -1,7 +1,3 @@
-# Copyright 2024 Zhenwei Shao and MILVLG team.
-# Licensed under the Apache License, Version 2.0.
-
-
 from typing import List, Optional, Tuple, Union
 
 import torch
@@ -9,56 +5,42 @@ import torch.nn as nn
 
 from transformers import AutoConfig, AutoModelForCausalLM
 
-from .phi2.modeling_phi import PhiConfig, PhiModel, PhiForCausalLM, CausalLMHead, CausalLMLoss
-from transformers.modeling_outputs import CausalLMOutputWithPast
+from .qwen2.modeling_qwen2 import Qwen2Config, Qwen2Model, Qwen2ForCausalLM
 
 from ..llava_arch import LlavaMetaModel, LlavaMetaForCausalLM
+from transformers.modeling_outputs import CausalLMOutputWithPast
 
-class ImpConfig(PhiConfig):
-    model_type = "imp"
+
+class ImpQwen2Config(Qwen2Config):
+    model_type = "imp_qwen2"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.activation_function = getattr(self, 'hidden_act', 'gelu_new')
-        self.attn_pdrop = getattr(self, 'attention_dropout', 0.0)
-        self.layer_norm_epsilon = getattr(self, 'layer_norm_eps', 1e-5)
-        self.n_embd = getattr(self, 'hidden_size', 2560)
-        self.n_head = getattr(self, 'num_attention_heads', 32)
-        self.n_layer = getattr(self, 'num_hidden_layers', 32)
-        self.n_positions = getattr(self, 'max_position_embeddings', 2048)
-        self.flash_attn = getattr(self, 'flash_attn', False)
-        self.flash_rotary = getattr(self, 'flash_rotary', False)
-        self.fused_dense = getattr(self, 'fused_dense', False)
-        self.n_head_kv = getattr(self, 'num_key_value_heads', None)
-        self.n_inner = getattr(self, 'intermediate_size', None)
-        self.rotary_dim = 32
-        # self.image_token_index = getattr(self, "image_token_index", 50296)
-        # self.image_token = getattr(self, "image_token", "<image>")
+
+class ImpQwen2Model(LlavaMetaModel, Qwen2Model):
+    config_class = ImpQwen2Config
+
+    def __init__(self, config: ImpQwen2Config):
+        super(ImpQwen2Model, self).__init__(config)
 
 
-class ImpModel(LlavaMetaModel, PhiModel):
-    config_class = ImpConfig
-
-    def __init__(self, config: ImpConfig):
-        super(ImpModel, self).__init__(config)
-
-
-class ImpForCausalLM(PhiForCausalLM, LlavaMetaForCausalLM):
-    config_class = ImpConfig
+class ImpQwen2ForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
+    # _tied_weights_keys = ["lm_head.weight"]
+    config_class = ImpQwen2Config
 
     def __init__(self, config):
-        super(ImpForCausalLM, self).__init__(config)
-        self.transformer = ImpModel(config)
-        # self.pretraining_tp = config.pretraining_tp
+        super(ImpQwen2ForCausalLM, self).__init__(config)
+        self.model = ImpQwen2Model(config)
         self.vocab_size = config.vocab_size
-        self.lm_head = CausalLMHead(config)
-        self.loss = CausalLMLoss()
+        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
+        self.need_clear_cache = False
+        # self.lm_head.weight = self.model.embed_tokens.weight
 
         # Initialize weights and apply final processing
         self.post_init()
 
     def get_model(self):
-        return self.transformer
+        return self.model
 
     def forward(
         self,
@@ -90,9 +72,9 @@ class ImpForCausalLM(PhiForCausalLM, LlavaMetaForCausalLM):
                 past_key_values,
                 labels,
                 images,
-                '3b'
+                '2b'
             )
-
+        # inputs_embeds.requires_grad_(True)
         return super().forward(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -115,5 +97,5 @@ class ImpForCausalLM(PhiForCausalLM, LlavaMetaForCausalLM):
             _inputs['images'] = images
         return _inputs
 
-AutoConfig.register("imp", ImpConfig)
-AutoModelForCausalLM.register(ImpConfig, ImpForCausalLM)
+AutoConfig.register("imp_qwen2", ImpQwen2Config)
+AutoModelForCausalLM.register(ImpQwen2Config, ImpQwen2ForCausalLM)

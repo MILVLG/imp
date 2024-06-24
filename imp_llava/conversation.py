@@ -10,6 +10,8 @@ class SeparatorStyle(Enum):
     MPT = auto()
     PLAIN = auto()
     LLAMA_2 = auto()
+    QWEN2 = auto()
+    PHI3 = auto()
 
 
 @dataclasses.dataclass
@@ -67,6 +69,26 @@ class Conversation:
                     ret += role + message + self.sep
                 else:
                     ret += role
+        elif self.sep_style == SeparatorStyle.QWEN2:
+            ret = self.system + self.sep2
+            for i, (role, message) in enumerate(messages):
+                if message:
+                    if type(message) is tuple:
+                        message, _, _ = message
+                    ret += role + message + self.sep2
+                else:
+                    ret += role
+        elif self.sep_style == SeparatorStyle.PHI3:
+            ret = ""#self.system + self.sep2
+            for i, (role, message) in enumerate(messages):
+                if message:
+                    if type(message) is tuple:
+                        message, _, _ = message
+                    ret += role + message + self.sep2 + '\n'
+                else:
+                    ret += role
+            if ret.endswith(self.sep2 + '\n'):
+                ret = ret[:-1]
         elif self.sep_style == SeparatorStyle.LLAMA_2:
             wrap_sys = lambda msg: f"<<SYS>>\n{msg}\n<</SYS>>\n\n"
             wrap_inst = lambda msg: f"[INST] {msg} [/INST]"
@@ -300,6 +322,17 @@ conv_llava_llama_2 = Conversation(
     sep2="</s>",
 )
 
+conv_phi3 = Conversation(
+    system="",
+    roles=("<|user|>\n", "<|assistant|>\n"),
+    version="phi3",
+    messages=(),
+    offset=0,
+    sep_style=SeparatorStyle.PHI3,
+    sep="",
+    sep2="<|end|>",
+)
+
 conv_mpt = Conversation(
     system="""<|im_start|>system
 A conversation between a user and an LLM-based AI assistant. The assistant gives helpful and honest answers.""",
@@ -370,6 +403,18 @@ conv_llava_v1_mmtag = Conversation(
     version="v1_mmtag",
 )
 
+conv_qwen2 = Conversation(
+    system="<|im_start|>system\nA chat between a curious user and an artificial intelligence assistant. "
+    "The assistant gives helpful, detailed, and polite answers to the user's questions.",
+    roles=("\n<|im_start|>user\n", "\n<|im_start|>assistant\n"),
+    version="qwen2",
+    messages=(),
+    offset=0,
+    sep_style=SeparatorStyle.QWEN2,
+    sep="",
+    sep2="<|im_end|>",
+)
+
 default_conversation = conv_vicuna_v1
 conv_templates = {
     "default": conv_vicuna_v0,
@@ -386,8 +431,9 @@ conv_templates = {
     "llava_v1": conv_llava_v1,
     "v1_mmtag": conv_llava_v1_mmtag,
     "llava_llama_2": conv_llava_llama_2,
-
     "mpt": conv_mpt,
+    "qwen2": conv_qwen2,
+    "phi3": conv_phi3
 }
 
 

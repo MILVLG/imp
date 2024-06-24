@@ -1,5 +1,16 @@
-# Copyright 2024 Zhenwei Shao and MILVLG team.
-# Licensed under the Apache License, Version 2.0.
+#    Copyright 2023 Haotian Liu
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
 
 
 from typing import List, Optional, Tuple, Union
@@ -9,56 +20,43 @@ import torch.nn as nn
 
 from transformers import AutoConfig, AutoModelForCausalLM
 
-from .phi2.modeling_phi import PhiConfig, PhiModel, PhiForCausalLM, CausalLMHead, CausalLMLoss
+from .phi3.modeling_phi3 import Phi3Config, Phi3Model, Phi3ForCausalLM
 from transformers.modeling_outputs import CausalLMOutputWithPast
 
 from ..llava_arch import LlavaMetaModel, LlavaMetaForCausalLM
 
-class ImpConfig(PhiConfig):
-    model_type = "imp"
+class ImpPhi3Config(Phi3Config):
+    model_type = "imp_phi3"
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.activation_function = getattr(self, 'hidden_act', 'gelu_new')
-        self.attn_pdrop = getattr(self, 'attention_dropout', 0.0)
-        self.layer_norm_epsilon = getattr(self, 'layer_norm_eps', 1e-5)
-        self.n_embd = getattr(self, 'hidden_size', 2560)
-        self.n_head = getattr(self, 'num_attention_heads', 32)
-        self.n_layer = getattr(self, 'num_hidden_layers', 32)
-        self.n_positions = getattr(self, 'max_position_embeddings', 2048)
-        self.flash_attn = getattr(self, 'flash_attn', False)
-        self.flash_rotary = getattr(self, 'flash_rotary', False)
-        self.fused_dense = getattr(self, 'fused_dense', False)
-        self.n_head_kv = getattr(self, 'num_key_value_heads', None)
-        self.n_inner = getattr(self, 'intermediate_size', None)
-        self.rotary_dim = 32
         # self.image_token_index = getattr(self, "image_token_index", 50296)
         # self.image_token = getattr(self, "image_token", "<image>")
 
 
-class ImpModel(LlavaMetaModel, PhiModel):
-    config_class = ImpConfig
+class ImpPhi3Model(LlavaMetaModel, Phi3Model):
+    config_class = ImpPhi3Config
 
-    def __init__(self, config: ImpConfig):
-        super(ImpModel, self).__init__(config)
+    def __init__(self, config: ImpPhi3Config):
+        super(ImpPhi3Model, self).__init__(config)
 
 
-class ImpForCausalLM(PhiForCausalLM, LlavaMetaForCausalLM):
-    config_class = ImpConfig
+class ImpPhi3ForCausalLM(Phi3ForCausalLM, LlavaMetaForCausalLM):
+    config_class = ImpPhi3Config
 
     def __init__(self, config):
-        super(ImpForCausalLM, self).__init__(config)
-        self.transformer = ImpModel(config)
-        # self.pretraining_tp = config.pretraining_tp
+        super(ImpPhi3ForCausalLM, self).__init__(config)
+        self.model = ImpPhi3Model(config)
         self.vocab_size = config.vocab_size
-        self.lm_head = CausalLMHead(config)
-        self.loss = CausalLMLoss()
+        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
+        self.need_clear_cache = False
+        # self.lm_head.weight = self.model.embed_tokens.weight
 
         # Initialize weights and apply final processing
         self.post_init()
 
     def get_model(self):
-        return self.transformer
+        return self.model
 
     def forward(
         self,
@@ -90,9 +88,9 @@ class ImpForCausalLM(PhiForCausalLM, LlavaMetaForCausalLM):
                 past_key_values,
                 labels,
                 images,
-                '3b'
+                '4b'
             )
-
+        # inputs_embeds.requires_grad_(True)
         return super().forward(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -115,5 +113,5 @@ class ImpForCausalLM(PhiForCausalLM, LlavaMetaForCausalLM):
             _inputs['images'] = images
         return _inputs
 
-AutoConfig.register("imp", ImpConfig)
-AutoModelForCausalLM.register(ImpConfig, ImpForCausalLM)
+AutoConfig.register("imp_phi3", ImpPhi3Config)
+AutoModelForCausalLM.register(ImpPhi3Config, ImpPhi3ForCausalLM)
