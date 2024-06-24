@@ -164,3 +164,6 @@ checkpoints/*
 
 playground/data/eval/*
 !playground/data/eval/.gitkeep
+
+logs/*
+!logs/.gitkeep
