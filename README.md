@@ -1,6 +1,6 @@
 # 😈 Imp
 
-[[Technical report](https://arxiv.org/abs/2405.12107)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG/)\]
+[[Technical report](https://arxiv.org/abs/2405.12107)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG)\]
 
 
 This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of highly capable yet efficient large multimodal models (LMMs). `Imp-v1-3B` is our first attempt with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set. After that, we further investigate different LLMs, training strategies, and traning data, and obtain a series of models termed `Imp-v1.5-2B/3B/4B`. 
@@ -8,6 +8,7 @@ This repository contains the official training/evaluation code of the Imp projec
 As shown in the [Evaluation](#evaluation), our Imp model significantly outperforms the counterparts of similar model sizes, and even achieves slightly better performance than the strong LLaVA-7B model on various multimodal benchmarks. 
 
 ## Updates
+- 6/27, 2024: Training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released.
 - May 21, 2024: The technical report and corresponding `Imp-v1.5-2B/3B/4B` model series are released on [HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
 - February 9, 2024: Training and evaluation codes of the `Imp-v1-3B` model are released.
 
@@ -38,7 +39,8 @@ pip install -r requirements.txt
 pip install flash-attn==2.4.2 --no-build-isolation
 ```
 
-3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. **Note that the latest version of the Phi-2 model is not compatible with this repository. We strongly recommend using the following script to download the specific versions of the base models.** 
+3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. **Note that the latest version of the Phi-2 model is not compatible with 'Imp-v1-3B','Imp-v1.5-3B' is the one with the latest version of the Phi-2.**
+**We recommend using the following script to download the specific versions of the base models if you want to use 'Imp-v1-3B'.** 
 ``` shell
 python scripts/download_models.py
 ```
@@ -50,7 +52,7 @@ checkpoints
     └── phi-2
 ```
 ## Model-zoo
-The checkpoints of different Imp models are provided in [Model_Zoo.md](./docs/Model_Zoo.md) .
+The checkpoints of `Imp-v1-3B` are provided in [Model_Zoo.md](./docs/Model_Zoo.md) . The checkpoints of `Imp-v1.5-2B/3B/4B` can be downloaded on [HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
 
 ## Training
 The training pipeline and datasets of our Imp models are directly inherited from [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA). The training  
@@ -59,15 +61,16 @@ The training pipeline and datasets of our Imp models are directly inherited from
 
 Imp is trained on 8 A100 (40G) GPUs. You can reduce the `per_device_train_batch_size` and increase the `gradient_accumulation_steps` to match your resources. .But always keep the global batch size the same: `global_batch_size ` = `per_device_train_batch_size` $`\times`$ `gradient_accumulation_steps` $`\times`$ `num_gpus`.
 
+
 <details>
 <summary>Training scripts </summary>
 
 ### Stage-1: Multimodal pretraining
-
+Take `Imp-v1-3B` as an example, all stages' checkpoint can be downloaded in [Model_Zoo.md](./docs/Model_Zoo.md).
 Please download the caption annotations `blip_laion_cc_sbu_558k.json` and images from [here](https://huggingface.co/datasets/liuhaotian/LLaVA-Pretrain). Move the downloaded files to the `./datasets` folder, with image folder unzipped and renamed to `pretrain_images`. Then run the following command to start the training process:
 
 ``` shell
-bash scripts/pretrain.sh
+bash scripts/pretrain.sh 
 ```
 
 After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b-stage1`.
@@ -117,11 +120,13 @@ bash scripts/merge.sh
 ```
 After that, a checkpoint file will be stored in `./checkpoints/imp-v1-3b`.
 
-### Finetuning on custom datasets
-You also can finetune Imp using your own custom dataset use `finetune_lora_custom.sh`. The custom dataset should be in the LLaVA-1.5 format.    
+### Finetuning on custom datasets (Recommend)
+You also can directly finetune different version Imp using your own custom dataset use `finetune_lora_custom.sh`. The custom dataset should be in the LLaVA-1.5 format.    
 
 ``` shell
-bash scripts/finetune_lora_custom.sh
+#imp_model should be hg repository or model path
+#version should be base model name, phi2/qwen1.5/phi3 
+bash scripts/finetune_lora_custom.sh -imp_model "path/to/imp" -version 'phi2/qwen1.5/phi3'
 ```
 </details>
 
@@ -143,7 +148,10 @@ Using our provided model, you can reproduce the following results. Our `imp-v1-3
 | [LLaVA-Phi](https://github.com/zhuyiche/llava-phi) (3B) | 71.40  | - | 35.90 |    68.40   |    48.60  | 85.00 | 1335.1 | 59.80 |28.9|
 | [MobileVLM](https://github.com/Meituan-AutoML/MobileVLM) (3B) | - | 59.00  | - |    61.00   |    47.50   | 84.90 | 1288.9 | 59.60  |-|
 | [MC-LLaVA](https://huggingface.co/visheratin/MC-LLaVA-3b) (3B) | 64.24 | 49.60  | 24.88 |    -   |    38.59   | 80.59 | - | -  |-|
-| **Imp-v1-3B** | **79.45**  | 58.55 | **50.09** |**69.96**| **59.38** | **88.02**| 1434.0 | **66.49**  |**33.1**|
+| **Imp-v1-3B** | 79.45  | 58.55 | 50.09 |69.96| 59.38 | 88.02| 1434.0 | 66.49  |33.1|
+| **Imp-v1.5-2B-Qwen1.5** | 79.2  | 61.93 | 39.16 |66.14| 54.52 | 86.74| 1434.0 | **66.49**  |**33.1**|
+| **Imp-v1-3B-Phi2** | 79.45  | 58.55 | **50.09** |**69.96**| **59.38** | **88.02**| 1434.0 | **66.49**  |**33.1**|
+| **Imp-v1-4B-Phi3** | 79.45  | 58.55 | 50.09 |**69.96**| **59.38** | **88.02**| 1434.0 | **66.49**  |**33.1**|
 
 ## Deployment
 Based on MLC-LLM, we provide a lightweight deployment solution so that imp can inference efficiently on the mobile device.

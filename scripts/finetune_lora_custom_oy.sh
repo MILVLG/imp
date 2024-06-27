@@ -1,33 +1,33 @@
 #!/bin/bash
 
-# script.sh
-while getopts "a:b:" opt; do
-  case $opt in
-    base_model) model_name_or_path="$OPTARG";;
-    v) version="$OPTARG";;
-    \?) echo "Invalid option: -$OPTARG" >&2; exit 1;;
-  esac
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -imp_model) IMP_MODEL="$2"; shift ;;
+        -version) VERSION="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
 done
-
-
 # uncomment the following lines to shutoff the internet access
 # export HF_HUB_OFFLINE=True
 # export HF_DATASETS_OFFLINE=1
 # export TRANSFORMERS_OFFLINE=1
-export IMP_SILIENT_OTHERS=true
 
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 # if not use all GPUs 
 # deepspeed --include localhost:0,1,2,3 --master_port 29600
 
-deepspeed imp_llava/train/train_mem.py \
+# IMP_MODEL='./checkpoints/imp-v1-3b-oy'  #finetune your own checkpoint
+# IMP_MODEL='/data/ouyangxc/labs/hg/upload/imp-v1.5-4b-phi3'
+
+deepspeed --include localhost:2,3 --master_port 29160 imp_llava/train/train_mem.py \
     --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed ./scripts/zero3.json \
-    --model_name_or_path $model_name_or_path \
-    --version $version \
+    --model_name_or_path $IMP_MODEL \
+    --version $VERSION \
     --data_path /data/common_datasets/llava/llava_v1_5_mix665k.json \
     --image_folder /data/common_datasets/llava/ft_datasets \
     --vision_tower ./checkpoints/siglip-so400m-patch14-384 \
-    --pretrain_mm_mlp_adapter ./checkpoints/imp-v1-3b-stage1/mm_projector.bin \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
@@ -36,11 +36,11 @@ deepspeed imp_llava/train/train_mem.py \
     --group_by_modality_length True \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/${model_name_or_path}-stage2-lora-oy \
+    --output_dir ./checkpoints/${IMP_MODEL}-custom \
     --num_train_epochs 1 \
-    --per_device_train_batch_size 2 \
+    --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 8 \
+    --gradient_accumulation_steps 4 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 50000 \

@@ -51,8 +51,6 @@ class CLIPVisionTower(nn.Module):
                 self.vision_tower = SiglipVisionModel.from_pretrained(self.vision_tower_name, device_map='auto')
             else:
                 self.vision_tower = SiglipVisionModel.from_pretrained(self.vision_tower_name)
-            print(self.vision_tower)
-            quit()
             del self.vision_tower.vision_model.encoder.layers[(self.select_layer + 1):]
             self.vision_tower.vision_model.head = nn.Identity()
         else:

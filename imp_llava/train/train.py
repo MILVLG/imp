@@ -816,11 +816,46 @@ def train():
     vision_tower = build_vision_tower(model_args)
 
     if model_args.vision_tower is not None:
-        if 'phi' in model_args.model_name_or_path or 'imp' in model_args.model_name_or_path:
-            config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+        if 'phi2' in model_args.model_name_or_path.lower():
+            if 'v1-3b' in model_args.model_name_or_path.lower():
+                if not model_args.model_name_or_path.endswith('/'):
+                    model_args.model_name_or_path = model_args.model_name_or_path + '/'
+                config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+                model = ImpForCausalLM.from_pretrained(
+                    model_args.model_name_or_path,
+                    config=config,
+                    cache_dir=training_args.cache_dir,
+                    **bnb_model_from_pretrained_args
+                )
+            elif 'v1.5-3b' in model_args.model_name_or_path.lower():
+                if not model_args.model_name_or_path.endswith('/'):
+                    model_args.model_name_or_path = model_args.model_name_or_path + '/'
+                config = Imp1_5Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+                model = Imp1_5ForCausalLM.from_pretrained(
+                    model_args.model_name_or_path,
+                    config=config,
+                    cache_dir=training_args.cache_dir,
+                    **bnb_model_from_pretrained_args
+                )
+        elif 'qwen1.5' in model_args.model_name_or_path.lower():
+            if not model_args.model_name_or_path.endswith('/'):
+                model_args.model_name_or_path = model_args.model_name_or_path + '/'
+            config = ImpQwen2Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             # config.flash_attn = True
             # config.flash_rotary = True
-            model = ImpForCausalLM.from_pretrained(
+            model = ImpQwen2ForCausalLM.from_pretrained(
+                model_args.model_name_or_path,
+                config=config,
+                cache_dir=training_args.cache_dir,
+                **bnb_model_from_pretrained_args
+            )
+        elif 'phi3' in model_args.model_name_or_path.lower():
+            if not model_args.model_name_or_path.endswith('/'):
+                model_args.model_name_or_path = model_args.model_name_or_path + '/'
+            config = ImpPhi3Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            # config.flash_attn = True
+            # config.flash_rotary = True
+            model = ImpPhi3ForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
                 config=config,
                 cache_dir=training_args.cache_dir,
@@ -872,12 +907,20 @@ def train():
         rank0_print("Adding LoRA adapters...")
         model = get_peft_model(model, lora_config)
 
-    if 'phi' in model_args.model_name_or_path:
+    if 'phi2' in model_args.model_name_or_path.lower() or 'phi3' in model_args.model_name_or_path.lower():
         tokenizer = transformers.AutoTokenizer.from_pretrained(
             model_args.model_name_or_path,
             cache_dir=training_args.cache_dir,
             model_max_length=training_args.model_max_length,
             padding_side="right"
+        )
+    elif 'qwen1.5' in model_args.model_name_or_path.lower():
+        tokenizer = transformers.AutoTokenizer.from_pretrained(
+            model_args.model_name_or_path, 
+            model_max_length=training_args.model_max_length,
+            psadding_side="right",
+            trust_remote_code=True, 
+            use_fast=False
         )
     else:
         tokenizer = transformers.AutoTokenizer.from_pretrained(
@@ -901,6 +944,14 @@ def train():
         tokenizer.pad_token = tokenizer.unk_token
         tokenizer.add_special_tokens({"eos_token": "</s>"})
         conversation_lib.default_conversation = conversation_lib.conv_templates['phi2']
+    elif model_args.version == "qwen1.5":
+        logger.info(f"Using {model_args.version} conversation template")
+        # tokenizer.pad_token = tokenizer.unk_token
+        tokenizer.unk_token = tokenizer.pad_token
+        conversation_lib.default_conversation = conversation_lib.conv_templates['qwen2']
+    elif model_args.version == "phi3":
+        logger.info(f"Using {model_args.version} conversation template")
+        conversation_lib.default_conversation = conversation_lib.conv_templates['phi3']
     else:
         # plain
         tokenizer.pad_token = tokenizer.unk_token
@@ -963,12 +1014,12 @@ def train():
                     if training_args.bf16 and module.weight.dtype == torch.float32:
                         module = module.to(torch.bfloat16)
     
-    if not model_args.tune_mm_mlp_adapter:
-        for n, p in model.get_model().embd.named_parameters():
-            logger.info(f'unfreezing {n}')
-            p.requires_grad = True
-    else:
-        logger.info(f'keep embedding frozen')
+    # if not model_args.tune_mm_mlp_adapter:
+    #     for n, p in model.get_model().embd.named_parameters():
+    #         logger.info(f'unfreezing {n}')
+    #         p.requires_grad = True
+    # else:
+    #     logger.info(f'keep embedding frozen')
 
     data_module = make_supervised_data_module(tokenizer=tokenizer,
                                               data_args=data_args)

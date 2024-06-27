@@ -13,9 +13,9 @@ deepspeed imp_llava/train/train_mem.py \
     --deepspeed ./scripts/zero2.json \
     --model_name_or_path /data/llm_common/phi-2 \
     --version plain \
-    --data_path datasets/blip_laion_cc_sbu_558k.json \
-    --image_folder datasets/pretrain_images/ \
-    --vision_tower checkpoints/ViT-SO400M-14-SigLIP-384 \
+    --data_path /data/common_datasets/llava/blip_laion_cc_sbu_558k.json \
+    --image_folder /data/common_datasets/llava/llava1.5_pretrain \
+    --vision_tower ./checkpoints/siglip-so400m-patch14-384 \
     --mm_projector_type mlp2x_gelu \
     --tune_mm_mlp_adapter True \
     --mm_vision_select_layer -2 \
@@ -23,7 +23,7 @@ deepspeed imp_llava/train/train_mem.py \
     --mm_use_im_patch_token False \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/imp-v1-3b-stage1 \
+    --output_dir ./checkpoints/imp-v1-3b-stage1-oy \
     --num_train_epochs 1 \
     --per_device_train_batch_size 32 \
     --per_device_eval_batch_size 4 \
