@@ -8,7 +8,7 @@ This repository contains the official training/evaluation code of the Imp projec
 As shown in the [Evaluation](#evaluation), our Imp model significantly outperforms the counterparts of similar model sizes, and even achieves slightly better performance than the strong LLaVA-7B model on various multimodal benchmarks. 
 
 ## Updates
-- 6/27, 2024: Training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released.
+- June 27, 2024: Training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released.
 - May 21, 2024: The technical report and corresponding `Imp-v1.5-2B/3B/4B` model series are released on [HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
 - February 9, 2024: Training and evaluation codes of the `Imp-v1-3B` model are released.
 

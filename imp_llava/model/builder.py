@@ -57,17 +57,17 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             logger.info(f'Load model name trained with LoRA, model base: {model_base}')
             assert 'imp' in model_name.lower(), 'The model name must contain `imp`'
             tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False, trust_remote_code=True)
-            if 'imp' in model_name.lower() and 'phi2' in model_name.lower():
-                if 'v1-3b' in model_name.lower():
-                    lora_cfg_pretrained = ImpConfig.from_pretrained(model_path)
-                    model = ImpForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
-                elif 'v1.5-3b' in model_name.lower():
+            if 'v1-3b' in model_name.lower() or  'phi2' in model_name.lower():
+                if 'v1.5-3b' in model_name.lower():
                     lora_cfg_pretrained = Imp1_5Config.from_pretrained(model_path)
                     model = Imp1_5ForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
-            elif 'imp' in model_name.lower() and 'qwen1.5' in model_name.lower():
+                else:
+                    lora_cfg_pretrained = ImpConfig.from_pretrained(model_path)
+                    model = ImpForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
+            elif 'qwen1.5' in model_name.lower():
                 lora_cfg_pretrained = ImpQwen2Config.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpQwen2ForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
-            elif 'imp' in model_name.lower() and 'phi3' in model_name.lower():
+            elif'phi3' in model_name.lower():
                 lora_cfg_pretrained = ImpPhi3Config.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpPhi3ForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
             else:
@@ -143,21 +143,24 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             logger.info(f'load fully fine-tuned model or HF Hub model: {model_path}')
             #hg version
             
-            if 'phi2' in model_name.lower() or '3b' in model_name.lower():
-                tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-                model = ImpForCausalLM.from_pretrained(model_path, **kwargs)
-                logger.info('Model is loaded...')
-            elif 'new' in model_name.lower():
-                tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-                model = Imp1_5ForCausalLM.from_pretrained(model_path, **kwargs)
-                logger.info('Model is loaded...')
-                # print(model)
-                # quit()
-            elif '2b' in model_name.lower():
+            if 'v1-3b' in model_name.lower() or 'phi2' in model_name.lower() or 'phi-2' in model_name.lower():
+                if 'v1-3b' in model_name.lower():
+                    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+                    model = ImpForCausalLM.from_pretrained(model_path, **kwargs)
+                    logger.info('Model is loaded...')
+                elif 'v1.5-3b' in model_name.lower():
+                    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+                    model = Imp1_5ForCausalLM.from_pretrained(model_path, **kwargs)
+                    logger.info('Model is loaded...')
+                else :
+                    tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+                    model = ImpForCausalLM.from_pretrained(model_path, **kwargs)
+                    logger.info('Model is loaded...')
+            elif 'qwen1.5' in model_name.lower():
                 tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpQwen2ForCausalLM.from_pretrained(model_path, **kwargs)
                 logger.info('Model is loaded...')
-            elif '4b' in model_name.lower():
+            elif 'phi3' in model_name.lower():
                 tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpPhi3ForCausalLM.from_pretrained(model_path, **kwargs)
                 logger.info('Model is loaded...')

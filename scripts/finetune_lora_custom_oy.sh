@@ -20,7 +20,7 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3
 # IMP_MODEL='./checkpoints/imp-v1-3b-oy'  #finetune your own checkpoint
 # IMP_MODEL='/data/ouyangxc/labs/hg/upload/imp-v1.5-4b-phi3'
 
-deepspeed --include localhost:2,3 --master_port 29160 imp_llava/train/train_mem.py \
+deepspeed --include localhost:0,1,2,3 --master_port 29160 imp_llava/train/train_mem.py \
     --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed ./scripts/zero3.json \
     --model_name_or_path $IMP_MODEL \
@@ -36,7 +36,7 @@ deepspeed --include localhost:2,3 --master_port 29160 imp_llava/train/train_mem.
     --group_by_modality_length True \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/${IMP_MODEL}-custom \
+    --output_dir ./checkpoints/${VERSION}-custom \
     --num_train_epochs 1 \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \

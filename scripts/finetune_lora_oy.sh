@@ -1,15 +1,5 @@
 #!/bin/bash
 
-# script.sh
-while getopts "a:b:" opt; do
-  case $opt in
-    base_model) model_name_or_path="$OPTARG";;
-    v) version="$OPTARG";;
-    \?) echo "Invalid option: -$OPTARG" >&2; exit 1;;
-  esac
-done
-
-
 # uncomment the following lines to shutoff the internet access
 # export HF_HUB_OFFLINE=True
 # export HF_DATASETS_OFFLINE=1
@@ -22,8 +12,8 @@ export IMP_SILIENT_OTHERS=true
 deepspeed imp_llava/train/train_mem.py \
     --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed ./scripts/zero3.json \
-    --model_name_or_path $model_name_or_path \
-    --version $version \
+    --model_name_or_path /data/llm_common/phi-2 \
+    --version phi2 \
     --data_path /data/common_datasets/llava/llava_v1_5_mix665k.json \
     --image_folder /data/common_datasets/llava/ft_datasets \
     --vision_tower ./checkpoints/siglip-so400m-patch14-384 \
@@ -36,7 +26,7 @@ deepspeed imp_llava/train/train_mem.py \
     --group_by_modality_length True \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/${model_name_or_path}-stage2-lora-oy \
+    --output_dir ./checkpoints/imp-v1-3b-stage2-lora-oy \
     --num_train_epochs 1 \
     --per_device_train_batch_size 2 \
     --per_device_eval_batch_size 4 \

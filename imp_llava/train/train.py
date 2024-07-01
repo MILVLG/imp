@@ -815,8 +815,9 @@ def train():
     # [Edited by zhenwei - 2024-01-31 13:33]
     vision_tower = build_vision_tower(model_args)
 
+
     if model_args.vision_tower is not None:
-        if 'phi2' in model_args.model_name_or_path.lower():
+        if 'phi2' in model_args.model_name_or_path.lower() or 'phi-2' in model_args.model_name_or_path.lower():
             if 'v1-3b' in model_args.model_name_or_path.lower():
                 if not model_args.model_name_or_path.endswith('/'):
                     model_args.model_name_or_path = model_args.model_name_or_path + '/'
@@ -837,12 +838,20 @@ def train():
                     cache_dir=training_args.cache_dir,
                     **bnb_model_from_pretrained_args
                 )
+            else:
+                if not model_args.model_name_or_path.endswith('/'):
+                    model_args.model_name_or_path = model_args.model_name_or_path + '/'
+                config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+                model = ImpForCausalLM.from_pretrained(
+                    model_args.model_name_or_path,
+                    config=config,
+                    cache_dir=training_args.cache_dir,
+                    **bnb_model_from_pretrained_args
+                )
         elif 'qwen1.5' in model_args.model_name_or_path.lower():
             if not model_args.model_name_or_path.endswith('/'):
                 model_args.model_name_or_path = model_args.model_name_or_path + '/'
             config = ImpQwen2Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
-            # config.flash_attn = True
-            # config.flash_rotary = True
             model = ImpQwen2ForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
                 config=config,
@@ -853,8 +862,6 @@ def train():
             if not model_args.model_name_or_path.endswith('/'):
                 model_args.model_name_or_path = model_args.model_name_or_path + '/'
             config = ImpPhi3Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
-            # config.flash_attn = True
-            # config.flash_rotary = True
             model = ImpPhi3ForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
                 config=config,
@@ -1000,6 +1007,9 @@ def train():
         training_args.use_im_start_end = model_args.mm_use_im_start_end
         model.config.mm_use_im_patch_token = model_args.mm_use_im_patch_token
         model.initialize_vision_tokenizer(model_args, tokenizer=tokenizer)
+    with open(f'tmp/debug_{local_rank}.txt', 'w') as f:
+        for name, param in model.named_parameters():
+            print(f'{name} {param.shape} {param.dtype} {param.device} {param.requires_grad}', file=f)
 
     if training_args.bits in [4, 8]:
         from peft.tuners.lora import LoraLayer
