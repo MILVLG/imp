@@ -17,22 +17,22 @@ SPLIT="llava_gqa_testdev_balanced"
 # merge eval
 # MODEL_CKPT="milvlg/imp-v1-3b"
 # MODEL_CKPT="/data/ouyangxc/labs/hg/imp-2b/old_phi_2ep/imp-v1-3b_1005ocr" # eval your own checkpoint
-MODEL_CKPT="/data/ouyangxc/github/imp/checkpoints/new_imp_v1_5"
+MODEL_CKPT="/data/ouyangxc/github/imp/checkpoints/imp_v1.5_3b_phi2"
 EVAL_CKPT="${MODEL_CKPT//\//_}_1"
 MODEL_PATH=$MODEL_CKPT
 # MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
 
-# for IDX in $(seq 0 $((CHUNKS-1))); do
-#     LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
-#         --model-path $MODEL_PATH \
-#         --question-file ./playground/data/eval/gqa/$SPLIT.jsonl \
-#         --image-folder /data/ouyangxc/data/gqa/images  \
-#         --answers-file ./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
-#         --num-chunks $CHUNKS \
-#         --chunk-idx $IDX \
-#         --temperature 0 \
-#         --conv-mode phi2 &
-# done
+for IDX in $(seq 0 $((CHUNKS-1))); do
+    LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
+        --model-path $MODEL_PATH \
+        --question-file ./playground/data/eval/gqa/$SPLIT.jsonl \
+        --image-folder /data/ouyangxc/data/gqa/images  \
+        --answers-file ./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
+        --num-chunks $CHUNKS \
+        --chunk-idx $IDX \
+        --temperature 0 \
+        --conv-mode phi2 &
+done
 
 wait
 
