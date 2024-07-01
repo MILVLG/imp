@@ -1059,46 +1059,46 @@ def train():
 
 
     if model_args.vision_tower is not None:
-        # if 'phi2' in model_args.model_name_or_path.lower() or 'phi-2' in model_args.model_name_or_path.lower():
-        #     if not model_args.model_name_or_path.endswith('/'):
-        #         model_args.model_name_or_path = model_args.model_name_or_path + '/'
-        #     config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
-        #     model = ImpForCausalLM.from_pretrained(
-        #         model_args.model_name_or_path,
-        #         config=config,
-        #         cache_dir=training_args.cache_dir,
-        #         **bnb_model_from_pretrained_args
-        #     )
-        # elif 'qwen1.5' in model_args.model_name_or_path.lower():
-        #     if not model_args.model_name_or_path.endswith('/'):
-        #         model_args.model_name_or_path = model_args.model_name_or_path + '/'
-        #     config = ImpQwen2Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
-        #     model = ImpQwen2ForCausalLM.from_pretrained(
-        #         model_args.model_name_or_path,
-        #         config=config,
-        #         cache_dir=training_args.cache_dir,
-        #         **bnb_model_from_pretrained_args
-        #     )
-        # elif 'phi3' in model_args.model_name_or_path.lower():
-        #     if not model_args.model_name_or_path.endswith('/'):
-        #         model_args.model_name_or_path = model_args.model_name_or_path + '/'
-        #     config = ImpPhi3Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
-        #     model = ImpPhi3ForCausalLM.from_pretrained(
-        #         model_args.model_name_or_path,
-        #         config=config,
-        #         cache_dir=training_args.cache_dir,
-        #         **bnb_model_from_pretrained_args
-        #     )
-        # else:
-        #     model = LlavaLlamaForCausalLM.from_pretrained(
-        #         model_args.model_name_or_path,
-        #         cache_dir=training_args.cache_dir,
-        #         **bnb_model_from_pretrained_args
-        #     )
-        if not model_args.model_name_or_path.endswith('/'):
-            model_args.model_name_or_path = model_args.model_name_or_path + '/'
-        tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
-        model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, att_implementation="flash_attebtion_2")
+        if 'phi2' in model_args.model_name_or_path.lower() or 'phi-2' in model_args.model_name_or_path.lower():
+            if not model_args.model_name_or_path.endswith('/'):
+                model_args.model_name_or_path = model_args.model_name_or_path + '/'
+            config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            model = ImpForCausalLM.from_pretrained(
+                model_args.model_name_or_path,
+                config=config,
+                cache_dir=training_args.cache_dir,
+                **bnb_model_from_pretrained_args
+            )
+        elif 'qwen1.5' in model_args.model_name_or_path.lower():
+            if not model_args.model_name_or_path.endswith('/'):
+                model_args.model_name_or_path = model_args.model_name_or_path + '/'
+            config = ImpQwen2Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            model = ImpQwen2ForCausalLM.from_pretrained(
+                model_args.model_name_or_path,
+                config=config,
+                cache_dir=training_args.cache_dir,
+                **bnb_model_from_pretrained_args
+            )
+        elif 'phi3' in model_args.model_name_or_path.lower():
+            if not model_args.model_name_or_path.endswith('/'):
+                model_args.model_name_or_path = model_args.model_name_or_path + '/'
+            config = ImpPhi3Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            model = ImpPhi3ForCausalLM.from_pretrained(
+                model_args.model_name_or_path,
+                config=config,
+                cache_dir=training_args.cache_dir,
+                **bnb_model_from_pretrained_args
+            )
+        else:
+            model = LlavaLlamaForCausalLM.from_pretrained(
+                model_args.model_name_or_path,
+                cache_dir=training_args.cache_dir,
+                **bnb_model_from_pretrained_args
+            )
+        # if not model_args.model_name_or_path.endswith('/'):
+        #     model_args.model_name_or_path = model_args.model_name_or_path + '/'
+        # tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+        # model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, att_implementation="flash_attebtion_2")
                 
     else:
         model = transformers.LlamaForCausalLM.from_pretrained(
