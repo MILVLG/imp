@@ -1,8 +1,16 @@
 #!/bin/bash
-MODEL_CKPT="imp-v1-3b-phi2-stage2_lora"
-# MODEL_CKPT="imp-v1-3b-lora" # eval your own checkpoint
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -imp_model) IMP_MODEL="$2"; shift ;;
+        -version) VERSION="$2"; shift ;;
+        -lora) MODEL_CKPT="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
 
 python -m imp_llava.eval.model_merge \
-    --model-path ./checkpoints/$MODEL_CKPT \
-    --model-base /data/llm_common/phi-2 \
-    --save-name imp-v1-3b-phi2-oy 
+    --model-path $MODEL_CKPT \
+    --model-base $IMP_MODEL \
+    --save-name imp-${version}-merged

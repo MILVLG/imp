@@ -112,7 +112,7 @@ class TrainingArguments(transformers.TrainingArguments):
     lora_bias: str = "none"
     mm_projector_lr: Optional[float] = None
     group_by_modality_length: bool = field(default=False)
-    gradient_ckeckpoint_kwargs : dict = {'use_reentrant': False}
+    gradient_ckeckpoint_kwargs: dict = field(default_factory=lambda: {'use_reentrant': False})
     gradient_checkpointing : bool = field(default=True)
 
 

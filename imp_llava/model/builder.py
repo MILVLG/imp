@@ -100,22 +100,22 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
                 logger.info(f'model_base:, {model_base}')
                 config = ImpConfig.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpForCausalLM.from_pretrained(model_base, **kwargs)
-                model.transformer.vision_tower = build_vision_tower(config)
-                model.transformer.mm_projector = build_vision_projector(config)
+                model.model.vision_tower = build_vision_tower(config)
+                model.model.mm_projector = build_vision_projector(config)
                 tokenizer = AutoTokenizer.from_pretrained(model_base)
             elif 'qwen1.5' in model_name.lower():
                 logger.info(f'model_base:, {model_base}')
                 config = ImpQwen2Config.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpQwen2ForCausalLM.from_pretrained(model_base, **kwargs)
-                model.transformer.vision_tower = build_vision_tower(config)
-                model.transformer.mm_projector = build_vision_projector(config)
+                model.model.vision_tower = build_vision_tower(config)
+                model.model.mm_projector = build_vision_projector(config)
                 tokenizer = AutoTokenizer.from_pretrained(model_base)
             elif 'phi3' in model_name.lower():
                 logger.info(f'model_base:, {model_base}')
                 config = ImpPhi3Config.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpPhi3ForCausalLM.from_pretrained(model_base, **kwargs)
-                model.transformer.vision_tower = build_vision_tower(config)
-                model.transformer.mm_projector = build_vision_projector(config)
+                model.model.vision_tower = build_vision_tower(config)
+                model.model.mm_projector = build_vision_projector(config)
                 tokenizer = AutoTokenizer.from_pretrained(model_base)
             
             else:

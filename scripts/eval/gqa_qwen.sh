@@ -17,7 +17,7 @@ SPLIT="llava_gqa_testdev_balanced"
 # merge eval
 # MODEL_CKPT="milvlg/imp-v1-3b"
 # MODEL_CKPT="/data/ouyangxc/labs/hg/imp-2b/old_phi_2ep/imp-v1-3b_1005ocr" # eval your own checkpoint
-MODEL_CKPT="/data/ouyangxc/labs/hg/upload/Imp-v1.5-2B-Qwen1.5/"
+MODEL_CKPT="/data/ouyangxc/github/imp/checkpoints/imp-v1-2b-qwen1.5-oy/"
 EVAL_CKPT="${MODEL_CKPT//\//_}_1"
 MODEL_PATH=$MODEL_CKPT
 # MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
