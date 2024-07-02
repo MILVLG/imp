@@ -162,7 +162,7 @@ Using our provided model, you can reproduce the following results. Our model sig
 | [LLaVA-Phi](https://github.com/zhuyiche/llava-phi) (3B) | 71.40  | - | 35.90 |    68.40   |    48.60  | 85.00 | 1335.1 | 59.80 |28.9|
 | [MobileVLM](https://github.com/Meituan-AutoML/MobileVLM) (3B) | - | 59.00  | - |    61.00   |    47.50   | 84.90 | 1288.9 | 59.60  |-|
 | [MC-LLaVA](https://huggingface.co/visheratin/MC-LLaVA-3b) (3B) | 64.24 | 49.60  | 24.88 |    -   |    38.59   | 80.59 | - | -  |-|
-| **Imp-v1-3B** | 79.45 | 58.55 | 50.09 |69.96| 59.38 | 88.02| 1434.0 | 66.49 |33.1|
+| [**Imp-v1-3B**](https://huggingface.co/MILVLG/imp-v1-3b) | 79.45 | 58.55 | 50.09 |69.96| 59.38 | 88.02| 1434.0 | 66.49 |33.1|
 | [**Imp-v1.5-2B-Qwen1.5**](https://huggingface.co/MILVLG/Imp-v1.5-2B-Qwen1.5) | 79.2  | 61.93 | 39.16 |66.14| 54.52 | 86.74| 1304.8 | 56.95 |33.5|
 | [**Imp-v1.5-3B-Phi2**](https://huggingface.co/MILVLG/Imp-v1.5-3B-Phi2) | 81.18  | **63.54** | **54.13** |72.78| 59.84 | **88.87**| 1446.4 | 72.94  |43.3|
 | [**Imp-v1.5-4B-Phi3**](https://huggingface.co/MILVLG/Imp-v1.5-4B-Phi3) | **81.46** | 63.51 | 51.16 |**78.28**| **60.16** | 86.86| **1507.7** | **73.28**  |**44.6**|
