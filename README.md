@@ -42,7 +42,7 @@ pip install -r requirements.txt
 pip install flash-attn==2.4.2 --no-build-isolation
 ```
 
-3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. (optional)
+<!-- 3. Download the pretrained base models (i.e., Phi-2 and SigLIP) to your local directories. (optional)
 ``` shell
 python scripts/download_models.py
 ```
@@ -52,7 +52,7 @@ checkpoints
 └── base
     └── siglip-so400m-patch14-384
     └── phi-2
-```
+``` -->
 ## Model-zoo
 The checkpoints of `Imp-v1.5-2B/3B/4B` can be downloaded on [HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
 
@@ -120,10 +120,8 @@ You will get a trained model `imp-v1-3b-stage2-lora` (a LoRA diff if you use `fi
 After the above model training, the model checkpoint consists of multiple sub-models. You can use the following script to merge the stage2 sub-models into a single one for release. Our evaluation script supports both the sub-models and merged model checkpoints. **However, if you want to fine-tune the model on your own custom dataset, only the merged model is supported.** 
 
 ``` shell
-``` shell
 #version should be the same as imp, only in phi2/qwen1.5/phi3
 bash scripts/merge.sh -imp_model "path/to/imp"  -lora 'path/to/lora' -version 'phi2'
-```
 ```
 After that, a checkpoint file will be stored in `./checkpoints/imp-{version}-merged`.
 
