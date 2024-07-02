@@ -3,14 +3,14 @@
 [[Technical report](https://arxiv.org/abs/2405.12107)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG)\]
 
 
-This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of highly capable yet efficient large multimodal models (LMMs). `Imp-v1.5-3B` is our attempt with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set. After that, we further investigate different LLMs, training strategies, and traning data, and obtain a series of models termed `Imp-v1.5-2B/4B`. 
+This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of highly capable yet efficient large multimodal models (LMMs). `Imp-v1-3B` is our attempt with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set. After that, we further investigate different LLMs, training strategies, and traning data, and obtain a series of models termed `Imp-v1.5-2B/3B/4B`. 
 
 As shown in the [Evaluation](#evaluation), our Imp model significantly outperforms the counterparts of similar model sizes, and even achieves slightly better performance than the strong LLaVA-7B model on various multimodal benchmarks. 
 
-Now the training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released. And the Multimodal instruction tuning data will be released as soon as possible.
+Now the training and evaluation codes of `Imp-v1-3B` and `Imp-v1.5-2B/3B/4B` are released. And the Multimodal instruction tuning data will be released as soon as possible.
 
 ## Updates
-- June 27, 2024: Training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released.
+- July 3, 2024: Training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released.
 - May 21, 2024: The technical report and corresponding `Imp-v1.5-2B/3B/4B` model series are released on [HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
 - February 9, 2024: Training and evaluation codes of the `Imp-v1-3B` model are released.
 
@@ -54,7 +54,7 @@ checkpoints
     └── phi-2
 ``` -->
 ## Model-zoo
-The checkpoints of `Imp-v1.5-2B/3B/4B` can be downloaded on [HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
+All models of `Imp` family can be checked on [Model_Zoo.md](./docs/Model_Zoo.md).
 
 ## Training
 The training pipeline and datasets of our Imp models are directly inherited from [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA). The training  
@@ -63,7 +63,7 @@ The training pipeline and datasets of our Imp models are directly inherited from
 
 Imp is trained on 8 A100 (40G) GPUs. You can reduce the `per_device_train_batch_size` and increase the `gradient_accumulation_steps` to match your resources. .But always keep the global batch size the same: `global_batch_size ` = `per_device_train_batch_size` $`\times`$ `gradient_accumulation_steps` $`\times`$ `num_gpus`.
 
-You can directly finetune `Imp-v1.5-2B/3B/4B` on your custom datasets in [Finetuning](#Finetuning) .
+You can directly finetune `imp` on your custom datasets in [Finetuning](#Finetuning) .
 
 
 <details>
@@ -128,7 +128,7 @@ After that, a checkpoint file will be stored in `./checkpoints/imp-{version}-mer
 </details>
 
 ## Finetuning
-You can directly finetune different version Imp using your own custom dataset use `finetune_lora_custom.sh`. The custom dataset should be in the LLaVA-1.5 format.    
+You can directly finetune different versions of `Imp` using your own custom dataset use `finetune_lora_custom.sh`. The custom dataset should be in the LLaVA-1.5 format.    
 
 ``` shell
 #imp_model should be hg repository or local model path with imp
@@ -162,9 +162,10 @@ Using our provided model, you can reproduce the following results. Our model sig
 | [LLaVA-Phi](https://github.com/zhuyiche/llava-phi) (3B) | 71.40  | - | 35.90 |    68.40   |    48.60  | 85.00 | 1335.1 | 59.80 |28.9|
 | [MobileVLM](https://github.com/Meituan-AutoML/MobileVLM) (3B) | - | 59.00  | - |    61.00   |    47.50   | 84.90 | 1288.9 | 59.60  |-|
 | [MC-LLaVA](https://huggingface.co/visheratin/MC-LLaVA-3b) (3B) | 64.24 | 49.60  | 24.88 |    -   |    38.59   | 80.59 | - | -  |-|
+| **Imp-v1-3B** | 79.45 | 58.55 | 50.09 |69.96| 59.38 | 88.02| 1434.0 | 66.49 |33.1|
 | [**Imp-v1.5-2B-Qwen1.5**](https://huggingface.co/MILVLG/Imp-v1.5-2B-Qwen1.5) | 79.2  | 61.93 | 39.16 |66.14| 54.52 | 86.74| 1304.8 | 56.95 |33.5|
-| [**Imp-v1-3B-Phi2**](https://huggingface.co/MILVLG/Imp-v1.5-3B-Phi2) | 81.18  | **63.54** | **54.13** |72.78| 59.84 | **88.87**| 1446.4 | 72.94  |43.3|
-| [**Imp-v1-4B-Phi3**](https://huggingface.co/MILVLG/Imp-v1.5-4B-Phi3) | **81.46** | 63.51 | 51.16 |**78.28**| **60.16** | 86.86| **1507.7** | **73.28**  |**44.6**|
+| [**Imp-v1.5-3B-Phi2**](https://huggingface.co/MILVLG/Imp-v1.5-3B-Phi2) | 81.18  | **63.54** | **54.13** |72.78| 59.84 | **88.87**| 1446.4 | 72.94  |43.3|
+| [**Imp-v1.5-4B-Phi3**](https://huggingface.co/MILVLG/Imp-v1.5-4B-Phi3) | **81.46** | 63.51 | 51.16 |**78.28**| **60.16** | 86.86| **1507.7** | **73.28**  |**44.6**|
 
 ## Deployment
 Based on MLC-LLM, we provide a lightweight deployment solution so that imp can inference efficiently on the mobile device.

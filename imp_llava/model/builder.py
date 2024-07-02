@@ -119,9 +119,12 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
                 tokenizer = AutoTokenizer.from_pretrained(model_base)
             
             else:
-                tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
-                cfg_pretrained = AutoConfig.from_pretrained(model_path)
-                model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=cfg_pretrained, **kwargs)
+                logger.info(f'model_base:, {model_base}')
+                config = ImpConfig.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpForCausalLM.from_pretrained(model_base, **kwargs)
+                model.model.vision_tower = build_vision_tower(config)
+                model.model.mm_projector = build_vision_projector(config)
+                tokenizer = AutoTokenizer.from_pretrained(model_base)
             mm_projector_weights = torch.load(os.path.join(model_path, 'mm_projector.bin'), map_location='cpu')
             mm_projector_weights = {k: v.to(torch.float16) for k, v in mm_projector_weights.items()}
             logger.info(f'loading mm projector weights: {[*mm_projector_weights.keys()]}')
@@ -145,8 +148,9 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
                 model = ImpPhi3ForCausalLM.from_pretrained(model_path, **kwargs)
                 logger.info('Model is loaded...')
             else:
-                tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=False)
-                model = LlavaLlamaForCausalLM.from_pretrained(model_path, low_cpu_mem_usage=True, **kwargs)
+                tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpForCausalLM.from_pretrained(model_path, **kwargs)
+                logger.info('Model is loaded...')
     else:
         raise NotImplementedError
         # Load language model

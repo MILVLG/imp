@@ -1096,15 +1096,19 @@ def train():
                 **bnb_model_from_pretrained_args
             )
         else:
-            model = LlavaLlamaForCausalLM.from_pretrained(
+            config = AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            model = ImpForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
+                config=config,
                 cache_dir=training_args.cache_dir,
+                attn_implementation='flash_attention_2',
                 **bnb_model_from_pretrained_args
             )
-        # if not model_args.model_name_or_path.endswith('/'):
-        #     model_args.model_name_or_path = model_args.model_name_or_path + '/'
-        # tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
-        # model = AutoModelForCausalLM.from_pretrained(model_args.model_name_or_path, att_implementation="flash_attebtion_2")
+            # model = LlavaLlamaForCausalLM.from_pretrained(
+            #     model_args.model_name_or_path,
+            #     cache_dir=training_args.cache_dir,
+            #     **bnb_model_from_pretrained_args
+            # )
                 
     else:
         model = transformers.LlamaForCausalLM.from_pretrained(
