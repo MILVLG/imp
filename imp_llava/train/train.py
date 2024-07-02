@@ -1062,31 +1062,37 @@ def train():
         if 'phi2' in model_args.model_name_or_path.lower() or 'phi-2' in model_args.model_name_or_path.lower():
             if not model_args.model_name_or_path.endswith('/'):
                 model_args.model_name_or_path = model_args.model_name_or_path + '/'
-            config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            # config = ImpConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            config = AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             model = ImpForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
                 config=config,
                 cache_dir=training_args.cache_dir,
+                attn_implementation='flash_attention_2',
                 **bnb_model_from_pretrained_args
             )
         elif 'qwen1.5' in model_args.model_name_or_path.lower():
             if not model_args.model_name_or_path.endswith('/'):
                 model_args.model_name_or_path = model_args.model_name_or_path + '/'
-            config = ImpQwen2Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            # config = ImpQwen2Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            config = AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             model = ImpQwen2ForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
                 config=config,
                 cache_dir=training_args.cache_dir,
+                attn_implementation='flash_attention_2',
                 **bnb_model_from_pretrained_args
             )
         elif 'phi3' in model_args.model_name_or_path.lower():
             if not model_args.model_name_or_path.endswith('/'):
                 model_args.model_name_or_path = model_args.model_name_or_path + '/'
-            config = ImpPhi3Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            # config = ImpPhi3Config.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+            config = AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             model = ImpPhi3ForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
                 config=config,
                 cache_dir=training_args.cache_dir,
+                attn_implementation='flash_attention_2',
                 **bnb_model_from_pretrained_args
             )
         else:
