@@ -167,6 +167,3 @@ playground/data/eval/*
 
 logs/*
 !logs/.gitkeep
-log_ft.txt
-
-scripts/eval/aok_qwen.sh
