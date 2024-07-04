@@ -15,18 +15,17 @@ GQADIR="./playground/data/eval/gqa/data"
 SPLIT="llava_gqa_testdev_balanced"
 
 # # merge eval
-# # MODEL_CKPT="milvlg/imp-v1-3b"
-# # MODEL_CKPT="/data/ouyangxc/labs/hg/imp-2b/old_phi_2ep/imp-v1-3b_1005ocr" # eval your own checkpoint
-# MODEL_CKPT="imp-3b-oy"
+# MODEL_CKPT="milvlg/imp-v1-3b"
+# # MODEL_CKPT="imp-v1-3b" # eval your own checkpoint
 # EVAL_CKPT="${MODEL_CKPT//\//_}_1"
 # # MODEL_PATH=$MODEL_CKPT
-# MODEL_PATH="/data/ouyangxc/labs/hg/upload/imp-v1-3b" # eval your own checkpoint
+# MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
 
 # for IDX in $(seq 0 $((CHUNKS-1))); do
 #     LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
 #         --model-path $MODEL_PATH \
 #         --question-file ./playground/data/eval/gqa/$SPLIT.jsonl \
-#         --image-folder /data/ouyangxc/data/gqa/images  \
+#         --image-folder /path/to/images  \
 #         --answers-file ./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
 #         --num-chunks $CHUNKS \
 #         --chunk-idx $IDX \
@@ -47,7 +46,7 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
         --model-path ./checkpoints/$MODEL_CKPT \
         --model-base $MODEL_BASE  \
         --question-file ./playground/data/eval/gqa/$SPLIT.jsonl \
-        --image-folder /data/ouyangxc/data/gqa/images  \
+        --image-folder /path/to/images  \
         --answers-file ./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \

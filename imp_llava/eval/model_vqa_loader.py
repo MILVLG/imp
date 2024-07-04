@@ -118,6 +118,7 @@ def eval_model(args):
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
         idx = line["question_id"]
         cur_prompt = line["text"]
+        # print(cur_prompt)
 
         input_ids = input_ids.to(device='cuda', non_blocking=True)
         stopping_criteria = KeywordsStoppingCriteria(keywords, tokenizer, input_ids)

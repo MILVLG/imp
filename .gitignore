@@ -169,6 +169,4 @@ logs/*
 !logs/.gitkeep
 log_ft.txt
 
-scripts/finetune_lora_custom_oy.sh
-scripts/finetune_lora_custom_new.sh
-scripts/finetune_lora_oy.sh
+scripts/eval/aok_qwen.sh

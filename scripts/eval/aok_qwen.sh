@@ -17,15 +17,15 @@ SPLIT="eval"
 # merge eval
 # MODEL_CKPT="milvlg/imp-v1-3b"
 # MODEL_CKPT="/data/ouyangxc/labs/hg/imp-2b/old_phi_2ep/imp-v1-3b_1005ocr" # eval your own checkpoint
-MODEL_CKPT="/data/ouyangxc/github/imp/checkpoints/imp-qwen1.5-aok-epoch2/"
-EVAL_CKPT="cot_qwen1_5_74_epoch2"
+MODEL_CKPT="/data/ouyangxc/labs/hg/upload/Imp-v1.5-2B-Qwen1.5/"
+EVAL_CKPT="base_qwen1_5_74"
 MODEL_PATH=$MODEL_CKPT
 # MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
     LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
         --model-path $MODEL_PATH \
-        --question-file /data/ouyangxc/github/CoT-V/datasets/aok/custom/aok_cot_eval.jsonl \
+        --question-file /data/ouyangxc/github/imp/playground/data/eval/aok/aok_base_input.jsonl \
         --image-folder /data/ouyangxc/data/coco2017/  \
         --answers-file ./playground/data/eval/aok/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
