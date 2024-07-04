@@ -10,7 +10,7 @@ export IMP_SILIENT_OTHERS=true
 # deepspeed --include localhost:0,1,2,3 --master_port 29600
 
 deepspeed imp_llava/train/train_mem.py \
-    --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
+    --lora_enable True --lora_r 256 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed ./scripts/zero3.json \
     --model_name_or_path checkpoints/base/phi-2 \
     --version phi2 \
@@ -27,7 +27,7 @@ deepspeed imp_llava/train/train_mem.py \
     --bf16 False \
     --fp16 True \
     --output_dir ./checkpoints/imp-v1-3b-stage2-lora \
-    --num_train_epochs 1 \
+    --num_train_epochs 2 \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 4 \
