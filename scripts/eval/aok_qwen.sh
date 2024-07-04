@@ -12,27 +12,27 @@ CHUNKS=${#GPULIST[@]}
 GQADIR="./playground/data/eval/gqa/data"
 
 
-SPLIT="llava_gqa_testdev_balanced"
+SPLIT="eval"
 
 # merge eval
 # MODEL_CKPT="milvlg/imp-v1-3b"
 # MODEL_CKPT="/data/ouyangxc/labs/hg/imp-2b/old_phi_2ep/imp-v1-3b_1005ocr" # eval your own checkpoint
-MODEL_CKPT="/data/ouyangxc/github/imp/checkpoints/imp-qwen1.5-aok-epoch2/"
-EVAL_CKPT="${MODEL_CKPT//\//_}_1"
+MODEL_CKPT="/data/ouyangxc/labs/hg/upload/Imp-v1.5-2B-Qwen1.5/"
+EVAL_CKPT="cot_73"
 MODEL_PATH=$MODEL_CKPT
 # MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
 
-for IDX in $(seq 0 $((CHUNKS-1))); do
-    LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
-        --model-path $MODEL_PATH \
-        --question-file ./playground/data/eval/gqa/$SPLIT.jsonl \
-        --image-folder /data/ouyangxc/data/gqa/images  \
-        --answers-file ./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
-        --num-chunks $CHUNKS \
-        --chunk-idx $IDX \
-        --temperature 0 \
-        --conv-mode qwen2 &
-done
+# for IDX in $(seq 0 $((CHUNKS-1))); do
+#     LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
+#         --model-path $MODEL_PATH \
+#         --question-file /data/ouyangxc/github/CoT-V/datasets/aok/custom/aok_cot_eval.jsonl \
+#         --image-folder /data/ouyangxc/data/coco2017/  \
+#         --answers-file ./playground/data/eval/aok/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
+#         --num-chunks $CHUNKS \
+#         --chunk-idx $IDX \
+#         --temperature 0 \
+#         --conv-mode qwen2 &
+# done
 
 wait
 
@@ -57,17 +57,13 @@ wait
 
 wait
 
-output_file=./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/merge.jsonl
+output_file=./playground/data/eval/aok/answers/$SPLIT/$EVAL_CKPT/merge.jsonl
 
 # Clear out the output file if it exists.
 > "$output_file"
 
 # Loop through the indices and concatenate each file.
 for IDX in $(seq 0 $((CHUNKS-1))); do
-    cat ./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl >> "$output_file"
+    cat ./playground/data/eval/aok/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl >> "$output_file"
 done
 
-python scripts/convert_gqa_for_eval.py --src $output_file --dst $GQADIR/testdev_balanced_predictions.json
-
-cd $GQADIR
-python eval/eval.py --tier testdev_balanced

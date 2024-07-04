@@ -10,7 +10,7 @@ As shown in the [Evaluation](#evaluation), our Imp model significantly outperfor
 Now the training and evaluation codes of `Imp-v1-3B` and `Imp-v1.5-2B/3B/4B` are released. And the Multimodal instruction tuning data will be released as soon as possible.
 
 ## Updates
-- July 3, 2024: Training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released.
+- July 4, 2024: Training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released.
 - May 21, 2024: The technical report and corresponding `Imp-v1.5-2B/3B/4B` model series are released on [HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
 - February 9, 2024: Training and evaluation codes of the `Imp-v1-3B` model are released.
 
@@ -121,7 +121,7 @@ After the above model training, the model checkpoint consists of multiple sub-mo
 
 ``` shell
 #version should be the same as imp, only in phi2/qwen1.5/phi3
-bash scripts/merge.sh -imp_model "path/to/imp"  -lora 'path/to/lora' -version 'phi2'
+bash scripts/merge.sh -imp_model "path/to/imp"  -lora "path/to/lora" -version "phi2"
 ```
 After that, a checkpoint file will be stored in `./checkpoints/imp-{version}-merged`.
 
@@ -133,7 +133,7 @@ You can directly finetune different versions of `Imp` using your own custom data
 ``` shell
 #imp_model should be hg repository or local model path with imp
 #version should be the same as imp, only in phi2/qwen1.5/phi3
-bash scripts/finetune_lora_custom.sh -imp_model "path/to/imp" -version 'phi2'
+bash scripts/finetune_lora_custom.sh -imp_model "path/to/imp" -version "phi2"
 ```
 You will get a trained lora model `imp-{version}-custom-lora`  under `./checkpoints/` .
 
@@ -141,7 +141,7 @@ After the above model Finetuning, you can use the following script to merge the 
 
 ``` shell
 #version should be the same as imp, only in phi2/qwen1.5/phi3
-bash scripts/merge.sh -imp_model "path/to/imp"  -lora 'path/to/lora' -version 'phi2'
+bash scripts/merge.sh -imp_model "path/to/imp"  -lora "path/to/lora" -version "phi2"
 ```
 After that, a checkpoint file will be stored in `./checkpoints/imp-{version}-merged`.
 

@@ -78,11 +78,11 @@ def eval_model(args):
     model_name = get_model_name_from_path(model_path)
     tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
 
-    if '3b' in model_name.lower() or 'new' in model_name.lower():
+    if 'phi2' in model_name.lower() or 'phi-2' in model_name.lower():
         keywords = ['</s>']
-    elif '2b' in model_name.lower():
+    elif 'qwen1.5' in model_name.lower():
         keywords = ['<|im_end|>']
-        print('before:', model.generation_config)
+        # print('before:', model.generation_config)
         model.generation_config.repetition_penalty = 1.
         model.generation_config.top_p = 1. if args.top_p is None else args.top_p
         model.generation_config.do_sample = True if args.temperature > 0 else False
@@ -91,8 +91,8 @@ def eval_model(args):
         model.generation_config.max_new_tokens = 2000 #args.max_new_tokens
         model.generation_config.use_cache = True
         model.generation_config.pad_token_id = tokenizer.eos_token_id
-        print('after:', model.generation_config)
-    elif '4b' in model_name.lower():
+        # print('after:', model.generation_config)
+    elif 'phi3' in model_name.lower():
         keywords = ['<|end|>']
         model.generation_config.repetition_penalty = 1.
         model.generation_config.top_p = 1. if args.top_p is None else args.top_p
@@ -123,7 +123,7 @@ def eval_model(args):
         stopping_criteria = KeywordsStoppingCriteria(keywords, tokenizer, input_ids)
 
         with torch.inference_mode():
-            if '3b' in model_name.lower() or 'new' in model_name.lower():
+            if 'phi2' in model_name.lower() or 'phi-2' in model_name.lower():
                 output_ids = model.generate(
                 input_ids,
                 images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
@@ -136,13 +136,13 @@ def eval_model(args):
                 stopping_criteria=[stopping_criteria],
                 use_cache=True
             )
-            elif '2b' in model_name.lower():
+            elif 'qwen1.5' in model_name.lower():
                 output_ids = model.generate(
                     input_ids,
                     images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
                     stopping_criteria=[stopping_criteria],
                 )
-            elif '4b' in model_name.lower():
+            elif 'phi3' in model_name.lower():
                 output_ids = model.generate(
                     input_ids,
                     images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
