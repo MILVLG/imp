@@ -13,4 +13,4 @@ done
 python -m imp_llava.eval.model_merge \
     --model-path $MODEL_CKPT \
     --model-base $IMP_MODEL \
-    --save-name imp-${version}-merged
+    --save-name imp-${VERSION}-merged

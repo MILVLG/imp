@@ -1104,11 +1104,6 @@ def train():
                 attn_implementation='flash_attention_2',
                 **bnb_model_from_pretrained_args
             )
-            # model = LlavaLlamaForCausalLM.from_pretrained(
-            #     model_args.model_name_or_path,
-            #     cache_dir=training_args.cache_dir,
-            #     **bnb_model_from_pretrained_args
-            # )
                 
     else:
         model = transformers.LlamaForCausalLM.from_pretrained(
@@ -1124,13 +1119,6 @@ def train():
         model.config.torch_dtype=(torch.float32 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=training_args.gradient_checkpointing)
 
-    # if training_args.gradient_checkpointing:
-    #     if hasattr(model, "enable_input_require_grads"):
-    #         model.enable_input_require_grads()
-    #     else:
-    #         def make_inputs_require_grad(module, input, output):
-    #             output.requires_grad_(True)
-    #         model.get_input_embeddings().register_forward_hook(make_inputs_require_grad)
 
     if training_args.lora_enable:
         from peft import LoraConfig, get_peft_model
@@ -1189,7 +1177,6 @@ def train():
         conversation_lib.default_conversation = conversation_lib.conv_templates['phi2']
     elif model_args.version == "qwen1.5":
         logger.info(f"Using {model_args.version} conversation template")
-        # tokenizer.pad_token = tokenizer.unk_token
         tokenizer.unk_token = tokenizer.pad_token
         conversation_lib.default_conversation = conversation_lib.conv_templates['qwen2']
     elif model_args.version == "phi3":
