@@ -47,5 +47,7 @@ if os.environ.get("LOCAL_RANK", None) in ["0", None]:
         "You are free to access the code where this info is came from and modify the log behavior. The Imp team wishes you a good day:)\033[0m\033[24m\n"
     )
 
-
-from .model import LlavaLlamaForCausalLM
+try:
+    from .model import LlavaLlamaForCausalLM
+except:
+    pass

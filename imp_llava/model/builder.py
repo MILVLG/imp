@@ -52,21 +52,22 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
         if 'lora' in model_name.lower() and model_base is None:
             warnings.warn('There is `lora` in model name but no `model_base` is provided. If you are loading a LoRA model, please provide the `model_base` argument. Detailed instruction: https://github.com/haotian-liu/LLaVA#launch-a-model-worker-lora-weights-unmerged.')
             exit()
-
         if 'lora' in model_name.lower() and model_base is not None:
             # Load model trained with LoRA
             logger.info(f'Load model name trained with LoRA, model base: {model_base}')
             assert 'imp' in model_name.lower(), 'The model name must contain `imp`'
-            lora_cfg_pretrained = ImpConfig.from_pretrained(model_path)
             tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False, trust_remote_code=True)
-            if 'imp' in model_name.lower():
-                model = ImpForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
+            if 'phi-2' in model_name.lower() or  'phi2' in model_name.lower():
+                    lora_cfg_pretrained = ImpConfig.from_pretrained(model_path)
+                    model = ImpForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
+            elif 'qwen1.5' in model_name.lower():
+                lora_cfg_pretrained = ImpQwen2Config.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpQwen2ForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
+            elif'phi3' in model_name.lower():
+                lora_cfg_pretrained = ImpPhi3Config.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpPhi3ForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
             else:
                 model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, **kwargs)
-            # token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
-            # if model.lm_head.weight.shape[0] != token_num:
-            #     model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
-            #     model.model.embed_tokens.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
 
             logger.info('Loading additional weights...')
             if os.path.exists(os.path.join(model_path, 'non_lora_trainables.bin')):
@@ -95,17 +96,35 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             logger.info('Model is loaded...')
         elif model_base is not None:
             logger.info('Load mm projector only model...')
-            if 'phi2' in model_name.lower() or 'imp' in model_name.lower():
+            if 'phi2' in model_name.lower() or 'phi-2' in model_name.lower():
                 logger.info(f'model_base:, {model_base}')
                 config = ImpConfig.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpForCausalLM.from_pretrained(model_base, **kwargs)
-                model.transformer.vision_tower = build_vision_tower(config)
-                model.transformer.mm_projector = build_vision_projector(config)
+                model.model.vision_tower = build_vision_tower(config)
+                model.model.mm_projector = build_vision_projector(config)
                 tokenizer = AutoTokenizer.from_pretrained(model_base)
+            elif 'qwen1.5' in model_name.lower():
+                logger.info(f'model_base:, {model_base}')
+                config = ImpQwen2Config.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpQwen2ForCausalLM.from_pretrained(model_base, **kwargs)
+                model.model.vision_tower = build_vision_tower(config)
+                model.model.mm_projector = build_vision_projector(config)
+                tokenizer = AutoTokenizer.from_pretrained(model_base)
+            elif 'phi3' in model_name.lower():
+                logger.info(f'model_base:, {model_base}')
+                config = ImpPhi3Config.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpPhi3ForCausalLM.from_pretrained(model_base, **kwargs)
+                model.model.vision_tower = build_vision_tower(config)
+                model.model.mm_projector = build_vision_projector(config)
+                tokenizer = AutoTokenizer.from_pretrained(model_base)
+            
             else:
-                tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
-                cfg_pretrained = AutoConfig.from_pretrained(model_path)
-                model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=cfg_pretrained, **kwargs)
+                logger.info(f'model_base:, {model_base}')
+                config = ImpConfig.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpForCausalLM.from_pretrained(model_base, **kwargs)
+                model.model.vision_tower = build_vision_tower(config)
+                model.model.mm_projector = build_vision_projector(config)
+                tokenizer = AutoTokenizer.from_pretrained(model_base)
             mm_projector_weights = torch.load(os.path.join(model_path, 'mm_projector.bin'), map_location='cpu')
             mm_projector_weights = {k: v.to(torch.float16) for k, v in mm_projector_weights.items()}
             logger.info(f'loading mm projector weights: {[*mm_projector_weights.keys()]}')
@@ -114,14 +133,24 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             logger.info('Model is loaded...')
         else:
             logger.info(f'load fully fine-tuned model or HF Hub model: {model_path}')
+            #hg version
             
-            if 'phi2' in model_name.lower() or 'imp' in model_name.lower():
+            if 'phi2' in model_name.lower() or 'phi-2' in model_name.lower():
                 tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
                 model = ImpForCausalLM.from_pretrained(model_path, **kwargs)
                 logger.info('Model is loaded...')
+            elif 'qwen1.5' in model_name.lower():
+                tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpQwen2ForCausalLM.from_pretrained(model_path, **kwargs)
+                logger.info('Model is loaded...')
+            elif 'phi3' in model_name.lower():
+                tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpPhi3ForCausalLM.from_pretrained(model_path, **kwargs)
+                logger.info('Model is loaded...')
             else:
-                tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=False)
-                model = LlavaLlamaForCausalLM.from_pretrained(model_path, low_cpu_mem_usage=True, **kwargs)
+                tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+                model = ImpForCausalLM.from_pretrained(model_path, **kwargs)
+                logger.info('Model is loaded...')
     else:
         raise NotImplementedError
         # Load language model

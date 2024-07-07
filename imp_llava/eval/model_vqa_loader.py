@@ -78,7 +78,30 @@ def eval_model(args):
     model_name = get_model_name_from_path(model_path)
     tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
 
-    keywords = ['</s>']
+    if 'phi2' in model_name.lower() or 'phi-2' in model_name.lower():
+        keywords = ['</s>']
+    elif 'qwen1.5' in model_name.lower():
+        keywords = ['<|im_end|>']
+        # print('before:', model.generation_config)
+        model.generation_config.repetition_penalty = 1.
+        model.generation_config.top_p = 1. if args.top_p is None else args.top_p
+        model.generation_config.do_sample = True if args.temperature > 0 else False
+        model.generation_config.temperature = args.temperature if args.temperature > 0 else 1.
+        model.generation_config.num_beams = args.num_beams
+        model.generation_config.max_new_tokens = 2000 #args.max_new_tokens
+        model.generation_config.use_cache = True
+        model.generation_config.pad_token_id = tokenizer.eos_token_id
+        # print('after:', model.generation_config)
+    elif 'phi3' in model_name.lower():
+        keywords = ['<|end|>']
+        model.generation_config.repetition_penalty = 1.
+        model.generation_config.top_p = 1. if args.top_p is None else args.top_p
+        model.generation_config.do_sample = True if args.temperature > 0 else False
+        model.generation_config.temperature = args.temperature if args.temperature > 0 else 1.
+        model.generation_config.num_beams = args.num_beams
+        model.generation_config.max_new_tokens = 2000 #args.max_new_tokens
+        model.generation_config.use_cache = True
+        model.generation_config.pad_token_id = tokenizer.eos_token_id
 
     questions = [json.loads(q) for q in open(os.path.expanduser(args.question_file), "r")]
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
@@ -95,12 +118,14 @@ def eval_model(args):
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
         idx = line["question_id"]
         cur_prompt = line["text"]
+        # print(cur_prompt)
 
         input_ids = input_ids.to(device='cuda', non_blocking=True)
         stopping_criteria = KeywordsStoppingCriteria(keywords, tokenizer, input_ids)
 
         with torch.inference_mode():
-            output_ids = model.generate(
+            if 'phi2' in model_name.lower() or 'phi-2' in model_name.lower():
+                output_ids = model.generate(
                 input_ids,
                 images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
                 do_sample=True if args.temperature > 0 else False,
@@ -112,6 +137,18 @@ def eval_model(args):
                 stopping_criteria=[stopping_criteria],
                 use_cache=True
             )
+            elif 'qwen1.5' in model_name.lower():
+                output_ids = model.generate(
+                    input_ids,
+                    images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
+                    stopping_criteria=[stopping_criteria],
+                )
+            elif 'phi3' in model_name.lower():
+                output_ids = model.generate(
+                    input_ids,
+                    images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
+                    stopping_criteria=[stopping_criteria],
+                )
 
         input_token_len = input_ids.shape[1]
         n_diff_input_output = (input_ids != output_ids[:, :input_token_len]).sum().item()
@@ -119,6 +156,8 @@ def eval_model(args):
             print(f'[Warning] {n_diff_input_output} output_ids are not the same as the input_ids')
         outputs = tokenizer.batch_decode(output_ids[:, input_token_len:], skip_special_tokens=True)[0]
         outputs = outputs.strip()
+        # print(outputs)
+        # quit()
 
         ans_id = shortuuid.uuid()
         ans_file.write(json.dumps({"question_id": idx,

@@ -117,19 +117,67 @@ class LlavaMetaForCausalLM(ABC):
         return image_features
 
     def prepare_inputs_labels_for_multimodal(
-        self, input_ids, position_ids, attention_mask, past_key_values, labels, images
+        self, input_ids, position_ids, attention_mask, past_key_values, labels, images,model_version='3b'
     ):
         vision_tower = self.get_vision_tower()
-        if vision_tower is None or images is None or input_ids.shape[1] == 1:
-            if past_key_values is not None and vision_tower is not None and images is not None and input_ids.shape[1] == 1:
-                target_shape = past_key_values.seqlen_offset + 1
-                attention_mask = torch.cat((attention_mask, torch.ones(
-                    (attention_mask.shape[0], target_shape - attention_mask.shape[1]),
+        if model_version == '3b':
+            if vision_tower is None or images is None or input_ids.shape[1] == 1:
+                if past_key_values is not None and vision_tower is not None and images is not None and input_ids.shape[1] == 1:
+                    target_shape = past_key_values.seqlen_offset + 1
+                    attention_mask = torch.cat((attention_mask, torch.ones(
+                        (attention_mask.shape[0], target_shape - attention_mask.shape[1]),
+                        dtype=attention_mask.dtype,
+                        device=attention_mask.device
+                    )), dim=1)
+                    position_ids = torch.sum(attention_mask, dim=1).unsqueeze(-1) - 1
+                return input_ids, position_ids, attention_mask, past_key_values, None, labels
+        elif model_version == '2b':
+            if past_key_values is not None:
+                target_shape = past_key_values[0][0].shape[2] + 1
+                attention_mask = torch.ones(
+                    (attention_mask.shape[0], target_shape),
                     dtype=attention_mask.dtype,
                     device=attention_mask.device
-                )), dim=1)
+                )
                 position_ids = torch.sum(attention_mask, dim=1).unsqueeze(-1) - 1
-            return input_ids, position_ids, attention_mask, past_key_values, None, labels
+                return input_ids[:, -1:], position_ids, attention_mask, past_key_values, None, labels
+            if vision_tower is None or images is None or input_ids.shape[1] == 1:
+                return input_ids, None, None, past_key_values, None, None
+        elif model_version == '4b':
+            if past_key_values is not None:
+                target_shape = past_key_values[0][0].shape[2] + 1
+                attention_mask = torch.ones(
+                    (attention_mask.shape[0], target_shape),
+                    dtype=attention_mask.dtype,
+                    device=attention_mask.device
+                )
+                position_ids = torch.sum(attention_mask, dim=1).unsqueeze(-1) - 1
+                # print('position_ids', position_ids.shape)
+                # print(input_ids[:, -1:].item())
+                return input_ids[:, -1:], position_ids, attention_mask, past_key_values, None, labels
+        elif model_version == 'new':
+            if past_key_values is not None:
+                target_shape = past_key_values[0][0].shape[2] + 1
+                attention_mask = torch.ones(
+                    (attention_mask.shape[0], target_shape),
+                    dtype=attention_mask.dtype,
+                    device=attention_mask.device
+                )
+                position_ids = torch.sum(attention_mask, dim=1).unsqueeze(-1) - 1
+                return input_ids[:, -1:], position_ids, attention_mask, past_key_values, None, labels
+            if vision_tower is None or images is None or input_ids.shape[1] == 1:
+                return input_ids, None, None, past_key_values, None, None
+        else: #"3b一样"
+            if vision_tower is None or images is None or input_ids.shape[1] == 1:
+                if past_key_values is not None and vision_tower is not None and images is not None and input_ids.shape[1] == 1:
+                    target_shape = past_key_values.seqlen_offset + 1
+                    attention_mask = torch.cat((attention_mask, torch.ones(
+                        (attention_mask.shape[0], target_shape - attention_mask.shape[1]),
+                        dtype=attention_mask.dtype,
+                        device=attention_mask.device
+                    )), dim=1)
+                    position_ids = torch.sum(attention_mask, dim=1).unsqueeze(-1) - 1
+                return input_ids, position_ids, attention_mask, past_key_values, None, labels
 
         if type(images) is list or images.ndim == 5:
             concat_images = torch.cat([image for image in images], dim=0)

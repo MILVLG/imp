@@ -9,6 +9,7 @@ gpu_list="${CUDA_VISIBLE_DEVICES:-0}"
 IFS=',' read -ra GPULIST <<< "$gpu_list"
 
 CHUNKS=${#GPULIST[@]}
+GQADIR="./playground/data/eval/gqa/data"
 
 
 SPLIT="llava_gqa_testdev_balanced"
@@ -17,14 +18,14 @@ SPLIT="llava_gqa_testdev_balanced"
 # MODEL_CKPT="milvlg/imp-v1-3b"
 # # MODEL_CKPT="imp-v1-3b" # eval your own checkpoint
 # EVAL_CKPT="${MODEL_CKPT//\//_}_1"
-# MODEL_PATH=$MODEL_CKPT
-# # MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
+# # MODEL_PATH=$MODEL_CKPT
+# MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
 
 # for IDX in $(seq 0 $((CHUNKS-1))); do
 #     LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
 #         --model-path $MODEL_PATH \
 #         --question-file ./playground/data/eval/gqa/$SPLIT.jsonl \
-#         --image-folder ./playground/data/eval/gqa/data/images  \
+#         --image-folder /path/to/images  \
 #         --answers-file ./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
 #         --num-chunks $CHUNKS \
 #         --chunk-idx $IDX \
@@ -35,16 +36,17 @@ SPLIT="llava_gqa_testdev_balanced"
 # wait
 
 # lora eval
-MODEL_CKPT="imp-v1-3b-stage2"
+MODEL_CKPT="imp-v1-3b-phi2-stage2_lora"
+# MODEL_CKPT="llava-phi2-lora-0427-1005_withocr"
 EVAL_CKPT="${MODEL_CKPT//\//_}_1"
-MODEL_BASE=checkpoints/base/phi-2
+MODEL_BASE=/data/llm_common/phi-2
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
     LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
         --model-path ./checkpoints/$MODEL_CKPT \
         --model-base $MODEL_BASE  \
         --question-file ./playground/data/eval/gqa/$SPLIT.jsonl \
-        --image-folder ./playground/data/eval/gqa/data/images  \
+        --image-folder /path/to/images  \
         --answers-file ./playground/data/eval/gqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \

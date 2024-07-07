@@ -158,3 +158,16 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+checkpoints/*
+!checkpoints/.gitkeep
+
+playground/data/eval/*
+!playground/data/eval/.gitkeep
+
+logs/*
+!logs/.gitkeep
+scripts/eval/aok_qwen.sh
+scripts/finetune_lora_custom_oy.sh
+tmp/*
+!tmp/.gitkeep

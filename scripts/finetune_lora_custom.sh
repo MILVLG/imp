@@ -1,5 +1,13 @@
 #!/bin/bash
 
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -imp_model) IMP_MODEL="$2"; shift ;;
+        -version) VERSION="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
 # uncomment the following lines to shutoff the internet access
 # export HF_HUB_OFFLINE=True
 # export HF_DATASETS_OFFLINE=1
@@ -8,17 +16,15 @@ export IMP_SILIENT_OTHERS=true
 
 # if not use all GPUs 
 # deepspeed --include localhost:0,1,2,3 --master_port 29600
-IMP_MODEL='milvlg/imp-v1-3b'
-# IMP_MODEL='./checkpoints/imp-v1-3b'  #finestune your own checkpoint
 
 deepspeed imp_llava/train/train_mem.py \
-    --lora_enable True --lora_r 128 --lora_alpha 256 --mm_projector_lr 2e-5 \
+    --lora_enable True --lora_r 256 --lora_alpha 256 --mm_projector_lr 2e-5 \
     --deepspeed ./scripts/zero3.json \
     --model_name_or_path $IMP_MODEL \
-    --version phi2 \
-    --data_path your/data/path.json \
-    --image_folder your/image/path \
-    --vision_tower checkpoints/base/siglip-so400m-patch14-384 \
+    --version $VERSION \
+    --data_path /data/common_datasets/llava/llava_v1_5_mix665k.json \
+    --image_folder /data/common_datasets/llava/ft_datasets \
+    --vision_tower ./checkpoints/siglip-so400m-patch14-384 \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \
@@ -27,11 +33,12 @@ deepspeed imp_llava/train/train_mem.py \
     --group_by_modality_length True \
     --bf16 False \
     --fp16 True \
-    --output_dir ./checkpoints/imp-v1-3b-satge3-custom \
-    --num_train_epochs 1 \
+    --output_dir ./checkpoints/imp-${VERSION}-lora-custom \
+    --num_train_epochs 2 \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 4 \
+    --gradient_checkpointing True\
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 50000 \

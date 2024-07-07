@@ -60,8 +60,6 @@ def split_to_even_chunks(indices, lengths, num_chunks):
             chunks_lengths[shortest_chunk] = float("inf")
 
     return chunks
-
-
 def get_modality_length_grouped_indices(lengths, batch_size, world_size, generator=None):
     # We need to use torch for the random part as a distributed sampler will set the random seed for torch.
     assert all(l != 0 for l in lengths), "Should not have zero length."
@@ -79,15 +77,23 @@ def get_modality_length_grouped_indices(lengths, batch_size, world_size, generat
 
     last_mm = mm_megabatches[-1]
     last_lang = lang_megabatches[-1]
-    additional_batch = last_mm + last_lang
+    # additional_batch = last_mm + last_lang
+    # interleave merges two lists together
+    additional_batch = []
+    for i in range(min(len(last_mm), len(last_lang))):
+        additional_batch.append(last_mm[i])
+        additional_batch.append(last_lang[i])
+    additional_batch += last_mm[len(last_lang):] + last_lang[len(last_mm):]
     megabatches = mm_megabatches[:-1] + lang_megabatches[:-1]
     megabatch_indices = torch.randperm(len(megabatches), generator=generator)
     megabatches = [megabatches[i] for i in megabatch_indices]
 
     if len(additional_batch) > 0:
-        megabatches.append(sorted(additional_batch, key=lambda i: abs(lengths[i]), reverse=True))
-
-    return [i for megabatch in megabatches for i in megabatch]
+        megabatches.append(additional_batch)
+    
+    ordered = [i for megabatch in megabatches for i in megabatch]
+    
+    return ordered
 
 
 def get_length_grouped_indices(lengths, batch_size, world_size, generator=None, merge=True):
@@ -166,8 +172,8 @@ class LLaVATrainer(Trainer):
             decay_parameters = get_parameter_names(opt_model, ALL_LAYERNORM_LAYERS)
             decay_parameters = [name for name in decay_parameters if "bias" not in name]
             if self.args.mm_projector_lr is not None:
-                # projector_parameters = [name for name, _ in opt_model.named_parameters() if "mm_projector" in name]
-                projector_parameters = [name for name, _ in opt_model.named_parameters() if "mm_projector" in name or "embd" in name]
+                projector_parameters = [name for name, _ in opt_model.named_parameters() if "mm_projector" in name]
+                # projector_parameters = [name for name, _ in opt_model.named_parameters() if "mm_projector" in name or "embd" in name]
                 optimizer_grouped_parameters = [
                     {
                         "params": [
