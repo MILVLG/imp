@@ -986,40 +986,40 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
                 eval_dataset=None,
                 data_collator=data_collator)
 
-def get_modality_length_grouped_indices(lengths, batch_size, world_size, generator=None):
-    # We need to use torch for the random part as a distributed sampler will set the random seed for torch.
-    assert all(l != 0 for l in lengths), "Should not have zero length."
-    if all(l > 0 for l in lengths) or all(l < 0 for l in lengths):
-        # all samples are in the same modality
-        return get_length_grouped_indices(lengths, batch_size, world_size, generator=generator)
-    mm_indices, mm_lengths = zip(*[(i, l) for i, l in enumerate(lengths) if l > 0])
-    lang_indices, lang_lengths = zip(*[(i, -l) for i, l in enumerate(lengths) if l < 0])
+# def get_modality_length_grouped_indices(lengths, batch_size, world_size, generator=None):
+#     # We need to use torch for the random part as a distributed sampler will set the random seed for torch.
+#     assert all(l != 0 for l in lengths), "Should not have zero length."
+#     if all(l > 0 for l in lengths) or all(l < 0 for l in lengths):
+#         # all samples are in the same modality
+#         return get_length_grouped_indices(lengths, batch_size, world_size, generator=generator)
+#     mm_indices, mm_lengths = zip(*[(i, l) for i, l in enumerate(lengths) if l > 0])
+#     lang_indices, lang_lengths = zip(*[(i, -l) for i, l in enumerate(lengths) if l < 0])
 
-    mm_shuffle = [mm_indices[i] for i in get_length_grouped_indices(mm_lengths, batch_size, world_size, generator=None)]
-    lang_shuffle = [lang_indices[i] for i in get_length_grouped_indices(lang_lengths, batch_size, world_size, generator=None)]
-    megabatch_size = world_size * batch_size
-    mm_megabatches = [mm_shuffle[i : i + megabatch_size] for i in range(0, len(mm_shuffle), megabatch_size)]
-    lang_megabatches = [lang_shuffle[i : i + megabatch_size] for i in range(0, len(lang_shuffle), megabatch_size)]
+#     mm_shuffle = [mm_indices[i] for i in get_length_grouped_indices(mm_lengths, batch_size, world_size, generator=None)]
+#     lang_shuffle = [lang_indices[i] for i in get_length_grouped_indices(lang_lengths, batch_size, world_size, generator=None)]
+#     megabatch_size = world_size * batch_size
+#     mm_megabatches = [mm_shuffle[i : i + megabatch_size] for i in range(0, len(mm_shuffle), megabatch_size)]
+#     lang_megabatches = [lang_shuffle[i : i + megabatch_size] for i in range(0, len(lang_shuffle), megabatch_size)]
 
-    last_mm = mm_megabatches[-1]
-    last_lang = lang_megabatches[-1]
-    # additional_batch = last_mm + last_lang
-    # interleave merges two lists together
-    additional_batch = []
-    for i in range(min(len(last_mm), len(last_lang))):
-        additional_batch.append(last_mm[i])
-        additional_batch.append(last_lang[i])
-    additional_batch += last_mm[len(last_lang):] + last_lang[len(last_mm):]
-    megabatches = mm_megabatches[:-1] + lang_megabatches[:-1]
-    megabatch_indices = torch.randperm(len(megabatches), generator=generator)
-    megabatches = [megabatches[i] for i in megabatch_indices]
+#     last_mm = mm_megabatches[-1]
+#     last_lang = lang_megabatches[-1]
+#     # additional_batch = last_mm + last_lang
+#     # interleave merges two lists together
+#     additional_batch = []
+#     for i in range(min(len(last_mm), len(last_lang))):
+#         additional_batch.append(last_mm[i])
+#         additional_batch.append(last_lang[i])
+#     additional_batch += last_mm[len(last_lang):] + last_lang[len(last_mm):]
+#     megabatches = mm_megabatches[:-1] + lang_megabatches[:-1]
+#     megabatch_indices = torch.randperm(len(megabatches), generator=generator)
+#     megabatches = [megabatches[i] for i in megabatch_indices]
 
-    if len(additional_batch) > 0:
-        megabatches.append(additional_batch)
+#     if len(additional_batch) > 0:
+#         megabatches.append(additional_batch)
     
-    ordered = [i for megabatch in megabatches for i in megabatch]
+#     ordered = [i for megabatch in megabatches for i in megabatch]
     
-    return ordered
+#     return ordered
 
 def train():
     global local_rank
@@ -1080,7 +1080,7 @@ def train():
                 model_args.model_name_or_path,
                 config=config,
                 cache_dir=training_args.cache_dir,
-                attn_implementation='flash_attention_2',
+                # attn_implementation='flash_attention_2',
                 **bnb_model_from_pretrained_args
             )
         elif 'phi3' in model_args.model_name_or_path.lower():
@@ -1249,6 +1249,7 @@ def train():
 
     data_module = make_supervised_data_module(tokenizer=tokenizer,
                                               data_args=data_args)
+    
     trainer = LLaVATrainer(model=model,
                     tokenizer=tokenizer,
                     args=training_args,

@@ -27,7 +27,6 @@ def get_chunk(lst, n, k):
     chunks = split_list(lst, n)
     return chunks[k]
 
-
 # Custom dataset class
 class CustomDataset(Dataset):
     def __init__(self, questions, image_folder, tokenizer, image_processor, model_config):
@@ -45,12 +44,11 @@ class CustomDataset(Dataset):
             qs = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN + '\n' + qs
         else:
             qs = DEFAULT_IMAGE_TOKEN + '\n' + qs
-
+            
         conv = conv_templates[args.conv_mode].copy()
         conv.append_message(conv.roles[0], qs)
         conv.append_message(conv.roles[1], None)
         prompt = conv.get_prompt()
-        # print(prompt)
 
         image = Image.open(os.path.join(self.image_folder, image_file)).convert('RGB')
         image_tensor = process_images([image], self.image_processor, self.model_config)[0]
@@ -88,20 +86,23 @@ def eval_model(args):
         model.generation_config.do_sample = True if args.temperature > 0 else False
         model.generation_config.temperature = args.temperature if args.temperature > 0 else 1.
         model.generation_config.num_beams = args.num_beams
-        model.generation_config.max_new_tokens = 2000 #args.max_new_tokens
+        model.generation_config.max_new_tokens = args.max_new_tokens
         model.generation_config.use_cache = True
         model.generation_config.pad_token_id = tokenizer.eos_token_id
         # print('after:', model.generation_config)
     elif 'phi3' in model_name.lower():
         keywords = ['<|end|>']
-        model.generation_config.repetition_penalty = 1.
-        model.generation_config.top_p = 1. if args.top_p is None else args.top_p
-        model.generation_config.do_sample = True if args.temperature > 0 else False
-        model.generation_config.temperature = args.temperature if args.temperature > 0 else 1.
-        model.generation_config.num_beams = args.num_beams
-        model.generation_config.max_new_tokens = 2000 #args.max_new_tokens
-        model.generation_config.use_cache = True
-        model.generation_config.pad_token_id = tokenizer.eos_token_id
+        # some bugs will be fixed -oy
+        # model.generation_config.repetition_penalty = 1.
+        # model.generation_config.top_p = 1. if args.top_p is None else args.top_p
+        # model.generation_config.do_sample = True if args.temperature > 0 else False
+        # model.generation_config.temperature = args.temperature if args.temperature > 0 else 1.
+        # model.generation_config.num_beams = args.num_beams
+        # model.generation_config.max_new_tokens = args.max_new_tokens
+        # model.generation_config.use_cache = True
+        # model.generation_config.pad_token_id = tokenizer.eos_token_id
+        # print('1:', model.generation_config)
+        # quit()
 
     questions = [json.loads(q) for q in open(os.path.expanduser(args.question_file), "r")]
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
@@ -118,7 +119,6 @@ def eval_model(args):
     for (input_ids, image_tensor), line in tqdm(zip(data_loader, questions), total=len(questions)):
         idx = line["question_id"]
         cur_prompt = line["text"]
-        # print(cur_prompt)
 
         input_ids = input_ids.to(device='cuda', non_blocking=True)
         stopping_criteria = KeywordsStoppingCriteria(keywords, tokenizer, input_ids)
@@ -135,8 +135,8 @@ def eval_model(args):
                 max_new_tokens=args.max_new_tokens,
                 # eos_token_id=tokenizer.eos_token_id,
                 stopping_criteria=[stopping_criteria],
-                use_cache=True
-            )
+                use_cache=True,
+                )
             elif 'qwen1.5' in model_name.lower():
                 output_ids = model.generate(
                     input_ids,
@@ -148,7 +148,15 @@ def eval_model(args):
                     input_ids,
                     images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
                     stopping_criteria=[stopping_criteria],
-                )
+                    do_sample=True if args.temperature > 0 else False,
+                    temperature = args.temperature if args.temperature > 0 else 1. ,
+                    num_beams=args.num_beams,
+                    max_new_tokens=args.max_new_tokens,
+                    use_cache = True,
+                    pad_token_id = tokenizer.eos_token_id,
+                    top_p = 1. if args.top_p is None else args.top_p ,
+                    repetition_penalty = 1. ,
+                    )
 
         input_token_len = input_ids.shape[1]
         n_diff_input_output = (input_ids != output_ids[:, :input_token_len]).sum().item()
@@ -156,8 +164,6 @@ def eval_model(args):
             print(f'[Warning] {n_diff_input_output} output_ids are not the same as the input_ids')
         outputs = tokenizer.batch_decode(output_ids[:, input_token_len:], skip_special_tokens=True)[0]
         outputs = outputs.strip()
-        # print(outputs)
-        # quit()
 
         ans_id = shortuuid.uuid()
         ans_file.write(json.dumps({"question_id": idx,
@@ -182,7 +188,7 @@ if __name__ == "__main__":
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
-    parser.add_argument("--max_new_tokens", type=int, default=128)
+    parser.add_argument("--max_new_tokens", type=int, default=2000)
     args = parser.parse_args()
 
     eval_model(args)

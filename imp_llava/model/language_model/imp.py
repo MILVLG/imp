@@ -106,7 +106,7 @@ class ImpForCausalLM(PhiPreTrainedModel, LlavaMetaForCausalLM):
                 past_key_values,
                 labels,
                 images,
-                'new'
+                'phi2'
             )
 
         outputs = self.model(

@@ -1,6 +1,6 @@
 # 😈 Imp
 
-[[Technical report](https://arxiv.org/abs/2405.12107)\]&nbsp;&nbsp;[[Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[Huggingface](https://huggingface.co/MILVLG)\]
+[[📖 Technical report](https://arxiv.org/abs/2405.12107)\]&nbsp;&nbsp;[[😈Demo](https://xmbot.net/imp/)\]&nbsp;&nbsp;[[🤗Huggingface](https://huggingface.co/MILVLG)\]
 
 
 This repository contains the official training/evaluation code of the Imp project, which aims to provide a family of highly capable yet efficient large multimodal models (LMMs). `Imp-v1-3B` is our attempt with only **3B** parameters, which is build upon a small yet powerful SLM [Phi-2](https://huggingface.co/microsoft/phi-2) (2.7B) and a powerful visual encoder [SigLIP](https://huggingface.co/google/siglip-so400m-patch14-384) (0.4B), and trained on the [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA) training set. After that, we further investigate different LLMs, training strategies, and traning data, and obtain a series of models termed `Imp-v1.5-2B/3B/4B`. 
@@ -11,7 +11,7 @@ Now the training and evaluation codes of `Imp-v1-3B` and `Imp-v1.5-2B/3B/4B` are
 
 ## Updates
 - July 4, 2024: Training and evaluation codes of `Imp-v1.5-2B/3B/4B` are released.
-- May 21, 2024: The technical report and corresponding `Imp-v1.5-2B/3B/4B` model series are released on [HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
+- May 21, 2024: The technical report and corresponding `Imp-v1.5-2B/3B/4B` model series are released on [🤗HuggingFace](https://huggingface.co/collections/MILVLG/imp-v15-664c07c27a71afa504f69cec).
 - February 9, 2024: Training and evaluation codes of the `Imp-v1-3B` model are released.
 
 ## Table of Contents
