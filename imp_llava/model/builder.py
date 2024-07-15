@@ -172,8 +172,7 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
                 tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=False)
                 model = AutoModelForCausalLM.from_pretrained(model_path, low_cpu_mem_usage=True, **kwargs)
 
-    logger.info('Tokenizer config: set `</s>` as `eos_token`.')
-    tokenizer.add_special_tokens({"eos_token": "</s>"})
+
 
     image_processor = None
 

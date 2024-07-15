@@ -72,7 +72,7 @@ class ImpQwen2ForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
                 past_key_values,
                 labels,
                 images,
-                '2b'
+                'qwen1.5'
             )
         # inputs_embeds.requires_grad_(True)
         return super().forward(

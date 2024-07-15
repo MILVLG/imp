@@ -171,3 +171,4 @@ scripts/eval/aok_qwen.sh
 scripts/finetune_lora_custom_oy.sh
 tmp/*
 !tmp/.gitkeep
+scripts/test/*

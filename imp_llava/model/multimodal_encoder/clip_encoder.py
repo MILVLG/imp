@@ -52,6 +52,7 @@ class CLIPVisionTower(nn.Module):
             else:
                 self.vision_tower = SiglipVisionModel.from_pretrained(self.vision_tower_name)
             del self.vision_tower.vision_model.encoder.layers[(self.select_layer + 1):]
+            self.vision_tower.vision_model.post_layernorm = nn.Identity()
             self.vision_tower.vision_model.head = nn.Identity()
         else:
             self.image_processor = CLIPImageProcessor.from_pretrained(self.vision_tower_name)

@@ -88,7 +88,7 @@ class ImpPhi3ForCausalLM(Phi3ForCausalLM, LlavaMetaForCausalLM):
                 past_key_values,
                 labels,
                 images,
-                '4b'
+                'phi3'
             )
         # inputs_embeds.requires_grad_(True)
         return super().forward(
