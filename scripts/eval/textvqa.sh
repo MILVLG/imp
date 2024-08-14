@@ -14,25 +14,25 @@ SPLIT="llava_textvqa_val"
 
 # merge eval
 # MODEL_CKPT="milvlg/imp-v1-3b"
-MODEL_CKPT="imp-3b-oy" # eval your own checkpoint
+MODEL_CKPT="imp-cuustom" # eval your own checkpoint
 EVAL_CKPT="${MODEL_CKPT//\//_}_1"
 # MODEL_PATH=$MODEL_CKPT
 MODEL_PATH="./checkpoints/$MODEL_CKPT" # eval your own checkpoint
 
 
-# for IDX in $(seq 0 $((CHUNKS-1))); do
-#     LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
-#         --model-path $MODEL_PATH \
-#         --question-file ./playground/data/eval/textvqa/llava_textvqa_val_v051_ocr.jsonl \
-#         --image-folder /data/ouyangxc/data/textvqa/train_images \
-#         --answers-file ./playground/data/eval/textvqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
-#         --num-chunks $CHUNKS \
-#         --chunk-idx $IDX \
-#         --temperature 0 \
-#         --conv-mode phi2 &
-# done
+for IDX in $(seq 0 $((CHUNKS-1))); do
+    LOCAL_RANK=$IDX CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m imp_llava.eval.model_vqa_loader \
+        --model-path /data/ouyangxc/github/imp/checkpoints/imp-qwen1.5-merged-cus1/ \
+        --question-file ./playground/data/eval/textvqa/llava_textvqa_val_v051_ocr.jsonl \
+        --image-folder ./playground/data/eval/textvqa/train_images \
+        --answers-file ./playground/data/eval/textvqa/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
+        --num-chunks $CHUNKS \
+        --chunk-idx $IDX \
+        --temperature 0 \
+        --conv-mode qwen2 &
+done
 
-# wait
+wait
 
 # # lora eval
 # MODEL_CKPT="imp-v1-3b-stage2-lora"
@@ -68,5 +68,5 @@ done
 
 
 python -m imp_llava.eval.eval_textvqa \
-    --annotation-file /data/ouyangxc/data/textvqa/TextVQA_0.5.1_val.json \
+    --annotation-file ./playground/data/eval/textvqa/llava_textvqa_val_v051_ocr.jsonl \
     --result-file $output_file

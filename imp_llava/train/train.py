@@ -1080,7 +1080,7 @@ def train():
                 model_args.model_name_or_path,
                 config=config,
                 cache_dir=training_args.cache_dir,
-                attn_implementation='flash_attention_2',
+                # attn_implementation='flash_attention_2',
                 **bnb_model_from_pretrained_args
             )
         elif 'phi3' in model_args.model_name_or_path.lower():
