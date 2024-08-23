@@ -79,12 +79,13 @@ class Conversation:
                 else:
                     ret += role
         elif self.sep_style == SeparatorStyle.PHI3:
-            ret = ""#self.system + self.sep2
+            # ret = ""#self.system + self.sep2 
+            ret = self.system + self.sep2 #oy
             for i, (role, message) in enumerate(messages):
                 if message:
                     if type(message) is tuple:
                         message, _, _ = message
-                    ret += role + message + self.sep2 + '\n'
+                    ret += role + message + self.sep2 #+ '\n'
                 else:
                     ret += role
             if ret.endswith(self.sep2 + '\n'):
@@ -322,9 +323,21 @@ conv_llava_llama_2 = Conversation(
     sep2="</s>",
 )
 
+# conv_phi3 = Conversation(
+#     system="",
+#     roles=("<|user|>\n", "<|assistant|>\n"),
+#     version="phi3",
+#     messages=(),
+#     offset=0,
+#     sep_style=SeparatorStyle.PHI3,
+#     sep="",
+#     sep2="<|end|>",
+# )
+
 conv_phi3 = Conversation(
-    system="",
-    roles=("<|user|>\n", "<|assistant|>\n"),
+    system="<|system|>\nA chat between a curious user and an artificial intelligence assistant. "
+    "The assistant gives helpful, detailed, and polite answers to the user's questions.",
+    roles=("\n<|user|>\n", "\n<|assistant|>\n"),
     version="phi3",
     messages=(),
     offset=0,

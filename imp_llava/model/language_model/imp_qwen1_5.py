@@ -25,7 +25,6 @@ class ImpQwen2Model(LlavaMetaModel, Qwen2Model):
 
 
 class ImpQwen2ForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
-    # _tied_weights_keys = ["lm_head.weight"]
     config_class = ImpQwen2Config
 
     def __init__(self, config):
@@ -34,7 +33,6 @@ class ImpQwen2ForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
         self.vocab_size = config.vocab_size
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
         self.need_clear_cache = False
-        # self.lm_head.weight = self.model.embed_tokens.weight
 
         # Initialize weights and apply final processing
         self.post_init()
@@ -56,7 +54,7 @@ class ImpQwen2ForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
         images: Optional[torch.FloatTensor] = None,
         return_dict: Optional[bool] = None,
     ) -> Union[Tuple, CausalLMOutputWithPast]:
-
+        
         if inputs_embeds is None:
             (
                 input_ids,
@@ -74,7 +72,7 @@ class ImpQwen2ForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
                 images,
                 'qwen1.5'
             )
-        # inputs_embeds.requires_grad_(True)
+        
         return super().forward(
             input_ids=input_ids,
             attention_mask=attention_mask,

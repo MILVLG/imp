@@ -56,6 +56,25 @@ checkpoints
 ## Model-zoo
 All models of `Imp` family can be checked on [Model_Zoo.md](./docs/Model_Zoo.md).
 
+## Customized Continue-Finetuning
+You can directly finetune different versions of `Imp` using your own custom dataset use `scripts/finetune_lora_custom.sh`. The custom dataset should be in the LLaVA-1.5 format.
+
+If you want to train an imp from scratch, please refers to [Training](#training).
+
+``` shell
+#imp_model should be hg repository or local model path with imp
+#version should be the same as imp, only in phi2/qwen1.5/phi3
+bash scripts/finetune_lora_custom.sh -imp_model "path/to/imp" -version "phi2"
+```
+You will get a trained lora model `imp-{version}-custom-lora`  under `./checkpoints/`. And you can use the following script to merge lora model and base `imp` into a single one for release and evaluation. Our [evaluation](./docs/Evaluation.md) script supports both the lora model and merged model checkpoints.
+
+``` shell
+#version should be the same as imp, only in phi2/qwen1.5/phi3
+bash scripts/merge.sh -imp_model "path/to/imp"  -lora "path/to/lora" -version "phi2"
+```
+After that, a checkpoint file will be stored in `./checkpoints/imp-{version}-merged`.
+
+
 ## Training
 The training pipeline and datasets of our Imp models are directly inherited from [LLaVA-v1.5](https://github.com/haotian-liu/LLaVA). The training  
 - *Multimodal pretraining*: train a projector on a subset of ∼558K image-text pairs to connect a frozen pretrained vision encoder and a frozen LLM.
@@ -64,10 +83,7 @@ The training pipeline and datasets of our Imp models are directly inherited from
 
 Imp is trained on 8 A100 (40G) GPUs. You can reduce the `per_device_train_batch_size` and increase the `gradient_accumulation_steps` to match your resources. .But always keep the global batch size the same: `global_batch_size ` = `per_device_train_batch_size` $`\times`$ `gradient_accumulation_steps` $`\times`$ `num_gpus`.
 
-
-You can directly finetune `imp` on your custom datasets in [Customized Continue-Finetuning](#customized-continue-finetuning) .
-
-
+<!-- You can directly finetune `imp` on your custom datasets in [Customized Continue-Finetuning](#customized-continue-finetuning) . -->
 
 <details>
 <summary>Training scripts </summary>
@@ -120,27 +136,12 @@ bash scripts/finetune_lora.sh
 You will get a trained model `imp-v1-3b-stage2-lora` (a LoRA diff if you use `finetune_lora.sh`) under `./checkpoints/` when the training is done.
 
 ### Lora merging
-After the above model training, the model checkpoint consists of base model and lora model. You can use the following script to merge them into a single one for release. Our evaluation script supports both the lora model and merged model checkpoints. **However, if you want to fine-tune the model on your own custom dataset, only the merged model is supported.** 
 
-``` shell
-#version should be the same as imp, only in phi2/qwen1.5/phi3
-bash scripts/merge.sh -imp_model "path/to/imp"  -lora "path/to/lora" -version "phi2"
-```
-After that, a checkpoint file will be stored in `./checkpoints/imp-{version}-merged`.
+After the above model training, the model checkpoint consists of base model and lora model. You can merge the lora model and base imp model into a single one by  scripts `merge.sh` in [merge](#customized-continue-finetuning).Our evaluation script supports both the lora model and merged model checkpoints. **However, if you want to fine-tune the model on your own custom dataset, only the merged model is supported.** 
+
 
 </details>
 
-## Customized Continue-Finetuning
-You can directly finetune different versions of `Imp` using your own custom dataset use `finetune_lora_custom.sh`. The custom dataset should be in the LLaVA-1.5 format.    
-
-``` shell
-#imp_model should be hg repository or local model path with imp
-#version should be the same as imp, only in phi2/qwen1.5/phi3
-bash scripts/finetune_lora_custom.sh -imp_model "path/to/imp" -version "phi2"
-```
-You will get a trained lora model `imp-{version}-custom-lora`  under `./checkpoints/` .
-
-You can merge the lora model and base imp model into a single one by  scripts `merge.sh` in [merge](#lora-merging)
 
 
 ## Evaluation
