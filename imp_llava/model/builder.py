@@ -58,6 +58,8 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             assert 'imp' in model_name.lower(), 'The model name must contain `imp`'
             tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False, trust_remote_code=True)
             if 'phi-2' in model_name.lower() or  'phi2' in model_name.lower():
+                    logger.info('Tokenizer config: set `</s>` as `eos_token`.')
+                    tokenizer.add_special_tokens({'eos_token': '</s>'})
                     lora_cfg_pretrained = ImpConfig.from_pretrained(model_path)
                     model = ImpForCausalLM.from_pretrained(model_base, config=lora_cfg_pretrained, **kwargs)
             elif 'qwen1.5' in model_name.lower():
@@ -137,6 +139,8 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             
             if 'phi2' in model_name.lower() or 'phi-2' in model_name.lower():
                 tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+                logger.info('Tokenizer config: set `</s>` as `eos_token`.')
+                tokenizer.add_special_tokens({'eos_token': '</s>'})
                 model = ImpForCausalLM.from_pretrained(model_path, **kwargs)
                 logger.info('Model is loaded...')
             elif 'qwen1.5' in model_name.lower():
