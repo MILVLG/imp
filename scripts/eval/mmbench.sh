@@ -26,6 +26,7 @@ SPLIT="mmbench_dev"
 #         --answers-file ./playground/data/eval/mmbench/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
 #         --num-chunks $CHUNKS \
 #         --chunk-idx $IDX \
+#         --single-pred-prompt \
 #         --temperature 0 \
 #         --conv-mode phi2 &
 # done
@@ -46,6 +47,7 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
         --answers-file ./playground/data/eval/mmbench/answers/$SPLIT/$EVAL_CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
+        --single-pred-prompt \
         --temperature 0 \
         --conv-mode phi2 &
 done
